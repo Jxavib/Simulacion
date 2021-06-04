@@ -1,0 +1,49 @@
+---
+title: "Taller 1"
+author: "Burbano Joel"
+date: "2/6/2021"
+output: html_document
+---
+```{r include=FALSE}
+# install.packages()
+```
+
+A un examen se han presentado un total de 80 alumnos y la probabilidad de aprobar el examen es de 0.85. Se pide
+
+a) Definir una variable aleatoria que cuente el número de alumnos que superan el examen. Identificar la distribución de probabilidad que sigue esta variable aleatoria
+
+  $X:$ número de alumnos que aprueban el examen de los que se presentan al mismo     
+  $$X\sim Bi(80,0.85)$$
+
+b) Calcular la probabilidad de que exactamente 55 alumnos superen el examen
+```{r include=FALSE}
+b=dbinom(55,80,0.85)
+
+```
+$P(X=55)=$``r b``
+
+
+c) Obtener la probabilidad de que al menos 65 alumnos superen el examen
+```{r}
+c=pbinom(64,80,0.85,lower.tail = F)
+```
+$P(X\geq 65)=1-P(X\leq64)=$``r c``
+
+d) Obtener la probabilidad de que entre 60 y 75 alumnos (ambos inclusive) superen el examen
+```{r include=FALSE}
+r=pbinom(c(59,75),80,0.85)
+d=r[2]-r[1]
+```
+$P(60\leq X\leq75)=P(X\leq75)-P(X\leq60)=$``r d``
+
+e) Calcular el valor de la variable tal que deja a su derecha un 35% de las observaciones
+```{r include=FALSE}
+e=qbinom(0.35,80,0.85,lower.tail = F)
+```
+``r e``
+
+f) Generar una muestra de 20 valores aleatorios de esta distribución.
+```{r include=FALSE}
+f <- rbinom(20,80,0.85)
+```
+``r f``

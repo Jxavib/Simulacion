@@ -1,8 +1,10 @@
 ---
 title: "Taller 1"
-author: "Burbano Joel"
+author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "4/6/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ```{r include=FALSE}
 # install.packages()

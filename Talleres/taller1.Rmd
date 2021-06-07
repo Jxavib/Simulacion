@@ -3,14 +3,14 @@ title: "Taller 1"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "4/6/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ```{r include=FALSE}
 # install.packages()
 ```
 
-A un examen se han presentado un total de 80 alumnos y la probabilidad de aprobar el examen es de 0.85. Se pide
+A un examen se han presentado un total de 80 alumnos y la probabilidad de aprobar el examen es de 0.85. Forma analitica Se pide
 
 a) **Definir una variable aleatoria que cuente el número de alumnos que superan el examen. Identificar la distribución de probabilidad que sigue esta variable aleatoria.**
 
@@ -51,3 +51,54 @@ f) **Generar una muestra de 20 valores aleatorios de esta distribución.**
 f <- rbinom(20,80,0.85)
 ```
     ``r f``
+    
+Forma asintotica
+a)
+    $X:$ número de alumnos que aprueban el examen de los que se presentan al mismo     
+    $$X\sim Bi(80,0.85)$$ 
+    se puede aproximar a una $N(np,npq)$ mediante el uso del TCL.
+    $$X \quad \sim \quad  N(np,npq)$$
+    donde $n=80$,  $p=0.85$ y $q=1-p$ 
+    
+```{r include=FALSE}
+n <- 80
+p <- 0.85
+q <- 1-p
+b1 <- dnorm(((55-n*p)/sqrt(n*p*q)),0,1)
+
+b1 <- as.character(b1)
+```
+b) 
+    $P(X=55)=P\left(\frac{X-np}{\sqrt{npq}}=\frac{55-68}{\sqrt{10.2}}\right)=$``r b1``
+
+c)  
+```{r include=F}
+  c1 <- pnorm(((65-n*p)/sqrt(n*p*q)),0,1,lower.tail = F)
+
+```
+    $P(X\geq 65)=P\left(\frac{X-np}{\sqrt{npq}}\geq\frac{65-68}{\sqrt{10.2}}\right)=$``r c1``
+
+d)
+```{r include=F}
+  r1=pnorm(c(((60-n*p)/sqrt(n*p*q)),((75-n*p)/sqrt(n*p*q))),0,1)
+  r2=pnorm(c(60,75),n*p,sqrt(n*p*q))
+  
+d1=r1[2]-r1[1]
+d2=r2[2]-r2[1]
+```
+    $P(65\leq X\leq 75)=P\left(\frac{65-68}{\sqrt{10.2}} \leq\frac{X-np}{\sqrt{npq}}\leq\frac{75-68}{\sqrt{10.2}}\right)=$``r d1``
+    
+e)
+```{r include=F}
+  e1=qnorm(0.35,0,1,lower.tail = F)
+```
+  ``r e1``
+  
+f) 
+```{r}
+f1 <- rnorm(20,n*p,sqrt(n*p*q))
+```
+
+    ``r f1``
+
+  

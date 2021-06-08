@@ -3,8 +3,8 @@ title: "Taller 1"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "4/6/2021"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 ```{r include=FALSE}
 # install.packages()
@@ -20,7 +20,7 @@ a) **Definir una variable aleatoria que cuente el número de alumnos que superan
 b) **Calcular la probabilidad de que exactamente 55 alumnos superen el examen.**
 ```{r include=FALSE}
 b=dbinom(55,80,0.85)
-b <- as.character(b)
+# b <- as.character(b)
 
 
 ```
@@ -38,7 +38,7 @@ d) **Obtener la probabilidad de que entre 60 y 75 alumnos (ambos inclusive) supe
 r=pbinom(c(59,75),80,0.85)
 d=r[2]-r[1]
 ```
-    $P(60\leq X\leq75)=P(X\leq75)-P(X\leq60)=$``r d``
+    $P(60\leq X\leq75)=P(X\leq75)-P(X<60)=$``r d``
 
 e) **Calcular el valor de la variable tal que deja a su derecha un 35% de las observaciones.**
 ```{r include=FALSE}
@@ -52,7 +52,9 @@ f <- rbinom(20,80,0.85)
 ```
     ``r f``
     
-Forma asintotica
+**Forma asintotica**
+
+
 a)
     $X:$ número de alumnos que aprueban el examen de los que se presentan al mismo     
     $$X\sim Bi(80,0.85)$$ 
@@ -64,16 +66,16 @@ a)
 n <- 80
 p <- 0.85
 q <- 1-p
-b1 <- dnorm(((55-n*p)/sqrt(n*p*q)),0,1)
+b1 <- dnorm(55,n*p,sqrt(n*p*q))
 
-b1 <- as.character(b1)
+# b1 <- as.character(b1)
 ```
 b) 
     $P(X=55)=P\left(\frac{X-np}{\sqrt{npq}}=\frac{55-68}{\sqrt{10.2}}\right)=$``r b1``
 
 c)  
 ```{r include=F}
-  c1 <- pnorm(((65-n*p)/sqrt(n*p*q)),0,1,lower.tail = F)
+  c1 <- pnorm(65,n*p,sqrt(n*p*q),lower.tail = F)
 
 ```
     $P(X\geq 65)=P\left(\frac{X-np}{\sqrt{npq}}\geq\frac{65-68}{\sqrt{10.2}}\right)=$``r c1``
@@ -90,12 +92,12 @@ d2=r2[2]-r2[1]
     
 e)
 ```{r include=F}
-  e1=qnorm(0.35,0,1,lower.tail = F)
+  e1=qnorm(0.35,n*p,sqrt(n*p*q),lower.tail = F)
 ```
   ``r e1``
   
 f) 
-```{r}
+```{r include=F}
 f1 <- rnorm(20,n*p,sqrt(n*p*q))
 ```
 

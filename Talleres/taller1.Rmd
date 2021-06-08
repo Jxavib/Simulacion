@@ -20,7 +20,7 @@ a) **Definir una variable aleatoria que cuente el número de alumnos que superan
 b) **Calcular la probabilidad de que exactamente 55 alumnos superen el examen.**
 ```{r include=FALSE}
 b=dbinom(55,80,0.85)
-# b <- as.character(b)
+ b <- as.character(b)
 
 
 ```
@@ -68,17 +68,17 @@ p <- 0.85
 q <- 1-p
 b1 <- dnorm(55,n*p,sqrt(n*p*q))
 
-# b1 <- as.character(b1)
+ b1 <- as.character(b1)
 ```
 b) 
-    $P(X=55)=P\left(\frac{X-np}{\sqrt{npq}}=\frac{55-68}{\sqrt{10.2}}\right)=$``r b1``
+    $P(X=55)=$``r b1``
 
 c)  
 ```{r include=F}
   c1 <- pnorm(65,n*p,sqrt(n*p*q),lower.tail = F)
 
 ```
-    $P(X\geq 65)=P\left(\frac{X-np}{\sqrt{npq}}\geq\frac{65-68}{\sqrt{10.2}}\right)=$``r c1``
+    $P(X\geq 65)=$``r c1``
 
 d)
 ```{r include=F}
@@ -88,7 +88,7 @@ d)
 d1=r1[2]-r1[1]
 d2=r2[2]-r2[1]
 ```
-    $P(65\leq X\leq 75)=P\left(\frac{65-68}{\sqrt{10.2}} \leq\frac{X-np}{\sqrt{npq}}\leq\frac{75-68}{\sqrt{10.2}}\right)=$``r d1``
+    $P(65\leq X\leq 75)=$``r d1``
     
 e)
 ```{r include=F}

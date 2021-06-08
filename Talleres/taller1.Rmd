@@ -3,7 +3,6 @@ title: "Taller 1"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "4/6/2021"
 output:
-  pdf_document: default
   html_document: default
 ---
 ```{r include=FALSE}
@@ -75,7 +74,7 @@ b)
 
 c)  
 ```{r include=F}
-  c1 <- pnorm(65,n*p,sqrt(n*p*q),lower.tail = F)
+  c1 <- pnorm(65-1/2,n*p,sqrt(n*p*q),lower.tail = F)
 
 ```
     $P(X\geq 65)=$``r c1``
@@ -83,12 +82,12 @@ c)
 d)
 ```{r include=F}
   r1=pnorm(c(((60-n*p)/sqrt(n*p*q)),((75-n*p)/sqrt(n*p*q))),0,1)
-  r2=pnorm(c(60,75),n*p,sqrt(n*p*q))
+  r2=pnorm(c(60+1/2,75+1/2),n*p,sqrt(n*p*q))
   
 d1=r1[2]-r1[1]
 d2=r2[2]-r2[1]
 ```
-    $P(65\leq X\leq 75)=$``r d1``
+    $P(65\leq X\leq 75)=$``r d2``
     
 e)
 ```{r include=F}

@@ -1,0 +1,86 @@
+---
+title: "Trabajo en clase"
+author: "Burbano Joel"
+date: "10/6/2021"
+output: html_document
+---
+
+# Simulación
+### Simular el lanzamiento de dos datos equilibrados, y obtener la distribución teórica y empírica de la suma del resultado obtenido.
+
+$Y:$ resultado sumar dos dados 
+
+Para los siguientes escenarios: $n=30,50,100$ y $m=100,500,1000$. Donde $n=$ números de lanzamiento y $m=$ número de veces que se repite el experimento.
+```{r include=F}
+# library(dplyr)
+n=30
+m=100
+
+```
+
+  * Obtenga la media y la varianza 
+  
+    - **Exacta** 
+    
+```{r include=F}
+library(prob)
+dados <- rolldie(2,6,makespace = T)
+class(dados)
+suma <- dados$X1+dados$X2
+mu <- mean(suma)
+desv <- sd(suma)
+histo <- hist(suma,breaks = c(0:12))
+```
+
+      $\mu=x_1f(x_1)+\cdots+x_nf(x_n)=$ ``r mu``
+      
+      $\sigma=$ ``r desv``
+    
+    - **Asintotica**
+    
+```{r include=F}
+s <- array()
+a <- replicate(2,{sample(6,n,replace = T)}) 
+s <- cbind(s,a[,1]+a[,2])
+s <- s[,-1]
+
+as <- t.test(s, y = NULL,alternative = c("two.sided"),mu = 0, paired = FALSE, var.equal = FALSE,conf.level = 0.95)
+
+l <- length(s)
+ alfa <- 0.05
+ varianza <- var(s)
+ L1 <- (l - 1) * varianza / qchisq(1-alfa / 2,l - 1)
+ L2 <- (l - 1) * varianza / qchisq(alfa /2,l - 1)
+ IC <- c(sqrt(L1),sqrt(L2))
+ IC
+```
+      
+      
+      Para el caso asintotico encontraremos un intervalo de confianza al $95\%$ generando una muestra alaeatoria de $n=$``r n``
+      
+      $\text{Intervalo de Confianza: } \mu \in$ [``r as$conf.int``]
+      
+      $\text{Intervalo de Confianza: } \sigma \in$ [``r IC``] 
+      
+    - **Simulación**
+```{r include=F}
+sim <- array()
+for (i in 1:m) {
+asi <- replicate(2,{sample(6,n,replace = T)}) 
+sim <- cbind(sim,asi[,1]+asi[,2])
+}
+sim <-sim[,-1]
+
+means <- apply(sim,2,mean)
+desvs <- apply(sim,2,sd)
+
+msim <- mean(means)
+dssim <- mean(desvs)
+```
+      
+      Para el caso aplicando simulación sea generado $m=$ ``r m`` veces el experimento con $n=$ ``r n``
+      
+      $\mu=$ ``r msim``
+      
+      $\sigma$ ``r dssim``
+    

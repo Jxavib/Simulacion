@@ -1,8 +1,10 @@
 ---
 title: "Trabajo en clase"
-author: "Burbano Joel"
+author: ',Beltran Henry, Burbano Joel, Guaman Ronny'
 date: "10/6/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 # Simulación
@@ -18,27 +20,42 @@ m=100
 
 ```
 
-  * Obtenga la media y la varianza 
+- Obtenga la media y la varianza 
   
-    - **Exacta** 
+  - **Exacta** 
+  
     
-```{r include=F}
-library(prob)
-dados <- rolldie(2,6,makespace = T)
-class(dados)
-suma <- dados$X1+dados$X2
-mu <- mean(suma)
-desv <- sd(suma)
-histo <- hist(suma,breaks = c(0:12))
-```
+    ```{r include=FALSE}
+      library(prob)
+      dados <- rolldie(2,6,makespace = T)
+      class(dados)
+      suma <- dados$X1+dados$X2
+      mu <- mean(suma)
+      desv <- sd(suma)
+      histo <- hist(suma,breaks = c(0:12))
+    ```
 
-      $\mu=x_1f(x_1)+\cdots+x_nf(x_n)=$ ``r mu``
+
+  $\mu=x_1f(x_1)+\cdots+x_nf(x_n)=$ ``r mu``
       
-      $\sigma=$ ``r desv``
+  $\sigma=$ ``r desv``
+      
+      
+    ```{r echo=FALSE}
+plot(histo,main = "Histograma de Suma",
+     xlab = "Suma",
+     ylab = "Frecuencia",
+     col =  heat.colors(10) ,
+     border = "black",
+     xlim = c(0, 12),
+     ylim = c(0, 7))
+```
+      
+      
     
-    - **Asintotica**
+  - **Asintotica**
     
-```{r include=F}
+    ```{r include=F}
 s <- array()
 a <- replicate(2,{sample(6,n,replace = T)}) 
 s <- cbind(s,a[,1]+a[,2])
@@ -56,14 +73,17 @@ l <- length(s)
 ```
       
       
-      Para el caso asintotico encontraremos un intervalo de confianza al $95\%$ generando una muestra alaeatoria de $n=$``r n``
       
-      $\text{Intervalo de Confianza: } \mu \in$ [``r as$conf.int``]
+  Para el caso asintotico encontraremos un intervalo de confianza al $95\%$ generando una muestra alaeatoria de $n=$``r n``
       
-      $\text{Intervalo de Confianza: } \sigma \in$ [``r IC``] 
+  $\text{Intervalo de Confianza: } \mu \in$ [``r as$conf.int``]
       
-    - **Simulación**
-```{r include=F}
+  $\text{Intervalo de Confianza: } \sigma \in$ [``r IC``] 
+      
+  - **Simulación**
+    
+    
+    ```{r include=F}
 sim <- array()
 for (i in 1:m) {
 asi <- replicate(2,{sample(6,n,replace = T)}) 
@@ -78,9 +98,10 @@ msim <- mean(means)
 dssim <- mean(desvs)
 ```
       
-      Para el caso aplicando simulación sea generado $m=$ ``r m`` veces el experimento con $n=$ ``r n``
       
-      $\mu=$ ``r msim``
+  Para el caso aplicando simulación sea generado $m=$ ``r m`` veces el experimento con $n=$ ``r n``
       
-      $\sigma$ ``r dssim``
+  $\mu=$ ``r msim``
+      
+  $\sigma=$ ``r dssim``
     

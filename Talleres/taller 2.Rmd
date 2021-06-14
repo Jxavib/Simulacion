@@ -8,62 +8,38 @@ output: html_document
 # install.packages()
 ```
 
-Uno de los primeros generadores fue denominado método de los cuadrados medios propuesto por Von Neuman (1946). Con este procedimiento se generan números pseudoaleatorios de 4 dígitos de la siguiente forma:
+Considerando el generador congruencial multiplicativo de parámetros $a=7^5=16807$, $c=0$ y $m=2^{31}-1$
 
-**i)**Se escoge un número de cuatro dígitos $x_0$ (semilla).
+**a)**¿Se observan los mismo problemas que con el algoritmo RANDU al considerar las tripletas$(x_k, x_{k+1}, x_{k+2})$?
 
-**ii)**Se eleva al cuadrado $(x_{0}^{2})$ y se toman los cuatro dígitos centrales $(x_1)$.
-
-**iii)**Se genera un número pseudo-aleatorio como
-    
-   $u_1=\frac{x_1}{10^4}$.
-    
-**iv)** Volver al paso ii) y repetir el proceso.
-
-Para obtener los $k$ (número par) dígitos centrales de $x_{i}^{2}$ se puede utilizar que:
-
-   $x_{i+1}=[(x_{i}^{2}-[\frac{x_{i}^{2}}{10^{(2k-\frac{k}{2})}}] 10^{2k-\frac{k}{2}})/10^\frac{k}{2}]$
-  
-El algoritmo está implementado en el fichero RANDVN.R. Estudiar las características del generador de cuadrados medios a partir de una secuencia de 500 valores obtenidos tomando como semilla inicial los cuatro primeros dígitos de DNI. Emplear únicamente métodos gráficos.
 
 ```{r include=TRUE}
-rm(list=ls(all=TRUE))
-
-initRANDVN <- function(semilla=as.numeric(Sys.time()), n=4) {
-  .semilla <<- as.double(semilla) %% 10^n  #C?lculos en doble precisi?n
-  .n <<- n
-  .aux <<- 10^(2*n-n/2)
-  .aux2 <<- 10^(n/2)
-  return(invisible(list(semilla=.semilla,n=.n)))
+initRANDC <- function(semilla=as.numeric(Sys.time()), a=2^16+3, c=0, m=2^31) {
+  .semilla <<- as.double(semilla) %% m  #C?lculos en doble precisi?n
+  .a <<- a
+  .c <<- c
+  .m <<- m
+  return(invisible(list(semilla=.semilla,a=.a,c=.c,m=.m))) #print(initRANDC())
 }
 
-RANDVN <- function() {
-    if (!exists(".semilla", envir=globalenv())) initRANDVN()
-    z <- .semilla^2
-    .semilla <<- trunc((z-trunc(z/.aux)*.aux)/.aux2)
-    return(.semilla/10^.n)
+RANDC <- function() {
+    if (!exists(".semilla", envir=globalenv())) initRANDC()
+    .semilla <<- (.a * .semilla + .c) %% .m
+    return(.semilla/.m)
 }
 
-RANDVNN <- function(n=1000) {
+RANDCN <- function(n=1000) {
     x <- numeric(n)
-    for(i in 1:n) x[i] <- RANDVN()
+    for(i in 1:n) x[i]<-RANDC()
     return(x)
-    # return(replicate(n,RANDVN()))  # Alternativa m?s r?pida
+    # return(replicate(n,RANDC()))  # Alternativa m?s r?pida    
 }
 
 ```
 
 ```{r include=TRUE}
-initRANDVN(2706)
-
-y=RANDVNN(500)
-
-
-hist(y,freq=FALSE)
-```
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+initRANDC(2706,7^5,0,2^31-1)
+w=RANDCN(9999)
 ```
 
 

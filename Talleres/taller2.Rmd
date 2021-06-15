@@ -2,7 +2,8 @@
 title: "Taller2"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "15/6/2021"
-output: html_document
+output:
+  html_document: default
 ---
 ```{r include=FALSE}
 # install.packages()
@@ -126,5 +127,11 @@ initRANDC(2706,7^5,0,2^31-1)
 w=RANDCN(9999)
 ```
 
+
+**b)** Estudiar la aleatoriedad de este generador empleando repetidamente el test de Ljung-Box, considerando $500$ pruebas con muestras de tamaño $50$ y hasta el salto $10$ ``(Box.test(u,lag=10, type="Ljung"))``. Comparar gráficamente el ajuste de las distribuciones del estadístico y $p$-valor a las de referencia.
+
+```{r echo=F}
+source("RANDC.r",local = knitr::knit_global())
+```
 
 

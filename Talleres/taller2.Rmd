@@ -9,90 +9,6 @@ output:
 # install.packages()
 ```
 
-6. Uno de los primeros generadores fue el denominado método de los cuadrados medios propuesto por Von Nuemman (1946). Con este procedimiente se generan números pseudoaleatorios de 4 digitos de la siguiente forma:
-
-  i. Se escoge un número de cuatro digitos $x_0$ (semilla)
-  ii. Seeleva al cuadrado $(x_0^2)$ y se toman los cuatro dígitos centrales $(x_1)$ 
-  iii. Se genera el número pseudo-aleatorio como
-   $$u_1=\frac{x_1}{10^4}$$
-  iv. Volver al paso ii y repetir el proceso
-  
-  Para obtener los $k$ (número par) dígitos centrales de $x_i^2$ se puede utilizar que: 
-   $$x_{i+1}=\left\lfloor\left(x_{i}^2 -\left\lfloor\frac{x_i^2}{10^{\left(2k-\frac{k}{2}\right)}}\right\rfloor 10^{\left(2k-\frac{k}{2}\right)} \right)/10^{\frac{k}{2}} \right\rfloor$$
-Estudiar las caracteristicas del generador de cuadrados medios a partir de una secuencia de 500 valores obtenidos tomando como semilla inicial los cuatro primeros dígitos del DNI. EMplear únicamente métodos gráficos.
-
-```{r, include=FALSE}
-rm(list=ls(all=TRUE))
-source("RANDVN.r", local = knitr::knit_global())
-# or sys.source("your-script.R", envir = knitr::knit_global())
-```
-
-Primero observemos una grafica en el cual la semilla viene dada por el reloj de la maquina
-
-```{r echo=FALSE}
-
-x <- RANDVNN(n = 500)
-# x
-plot(x,xlab = "Indice",ylab = "Aleatorios",main ="Grafica con semilla(reloj)")
-```
-
-```{r echo=FALSE}
-rm(list=ls(all=TRUE))
-source("RANDVN.r", local = knitr::knit_global())
-# or sys.source("your-script.R", envir = knitr::knit_global())
-
-a <- RANDVNN(n = 500)
-plot(a,xlab = "Indice",ylab = "Aleatorios",main ="Grafica con semilla(reloj)")
-```
-
-```{r echo=FALSE}
-rm(list=ls(all=TRUE))
-source("RANDVN.r", local = knitr::knit_global())
-# or sys.source("your-script.R", envir = knitr::knit_global())
-
-b <- RANDVNN(n = 500)
-plot(b,xlab = "Indice",ylab = "Aleatorios",main ="Grafica con semilla(reloj)")
-```
-
-Ahora observemos el grafico generado por la semilla=1750
-
-```{r echo=FALSE}
-rm(list=ls(all=TRUE))
-source("RANDVN2.r", local = knitr::knit_global())
-# or sys.source("your-script.R", envir = knitr::knit_global())
-
-d <- RANDVNN(n = 500)
-plot(d,xlab = "Indice",ylab = "Aleatorios",main ="Grafica con semilla=1750")
-```
-
-Cosas interesantes cuando $n=5$
-
-```{r echo=FALSE}
-rm(list = ls(all=T))
-source("RANDVN3.r",local = knitr::knit_global())
-```
-
-```{r echo=FALSE}
-rm(list = ls(all=T))
-source("RANDVN3.r",local = knitr::knit_global())
-```
-
-```{r echo=FALSE}
-rm(list = ls(all=T))
-source("RANDVN3.r",local = knitr::knit_global())
-```
-
-
-**Conclusiones**
-
-Luego de realizar varios experimentos con el algoritmo podemos concluir que en general con $n=4$ 
-
-*   EL algoritmo genera solo un numero limitado $<100$ numeros aleatorios 
-*   pasado cierto numero el algoritmo se vuelve repetitivo ("Dejan de ser números aleatorios")
-*   Si tomamos $n>5$ el algorimo genera mas números aleatorios que con $n=4$ es decir su rango se expande.
-
-
-
 Considerando el generador congruencial multiplicativo de parámetros $a=7^5=16807$, $c=0$ y $m=2^{31}-1$
 
 **a)**¿Se observan los mismo problemas que con el algoritmo RANDU al considerar las tripletas$(x_k, x_{k+1}, x_{k+2})$?
@@ -130,8 +46,22 @@ w=RANDCN(9999)
 
 **b)** Estudiar la aleatoriedad de este generador empleando repetidamente el test de Ljung-Box, considerando $500$ pruebas con muestras de tamaño $50$ y hasta el salto $10$ ``(Box.test(u,lag=10, type="Ljung"))``. Comparar gráficamente el ajuste de las distribuciones del estadístico y $p$-valor a las de referencia.
 
-```{r echo=F}
-source("RANDC.r",local = knitr::knit_global())
+```{r echo=TRUE}
+initRANDC(2706,7^5,0,2^31-1)
+npruebas <- 500
+Tmuestra <- 50
+pval <- rep(0,npruebas)
+estad <- rep(0,npruebas)
+for( i in 1:npruebas){
+u <- RANDCN(Tmuestra)
+jbu <- Box.test(u,lag=10,type="Ljung")
+pval[i] <- jbu$p.value
+estad[i] <- jbu$statistic
+}
+hist(pval, freq=F)
+```
+```{r include=TRUE}
+h <- hist(estad, breaks= "FD", freq=1)
 ```
 
 

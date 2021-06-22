@@ -4,6 +4,7 @@ author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "21/6/2021"
 output:
   html_document: default
+  pdf_document: default
 ---
 
 
@@ -55,7 +56,7 @@ b)  **Generar 1000 valores tomando como semilla inicial el n de grupo multiplica
 source("RANDC.R")
 initRANDC(400, a, c, m) # Establecer semilla y parámetros
 nsim <-1000
-system.time(u <- RANDCN(nsim)) # Generar
+system.time(ran <- RANDCN(nsim)) # Generar
 
 ```
 
@@ -67,12 +68,13 @@ source("Diagnosis contrastes.r")
 c)  **Representar los pares de datos $\left( u_{i}, u_{i+1} \right)$, ¿se observa algún problema?.**
 
 ```{r}
-v=u[-1]
+v <- ran[-1]
 v <- c(v,1)
-z <-cbind(u,v)
-plot(z)
+z <-cbind(ran,v)
+plot(z,xlab = "u_i",ylab = "u_{i+1}")
 ```
 
+Se puede apreciar cierta dependencia de los valores $u_i,~u_{i+1}$
 
 d)  **Estudiar la aleatoriedad de este generador empleando repetidamente el test de Ljung-Box, considerando 500 pruebas con muestras de tamaño 50 y hasta el salto 10 (`Box.test(u,lag=10, type=Ljung)`). Comparar el ajuste de las distribuciones del estadístico y $p$-valor a las de referencia.**
 
@@ -88,10 +90,10 @@ jbu <- Box.test(u,lag=10,type="Ljung")
 pval[i] <- jbu$p.value
 estad[i] <- jbu$statistic
 }
-hist(pval, freq=F)
+hist(pval, freq=F,main = "Histograma de p-valor")
 ```
 ```{r include=TRUE}
-h <- hist(estad, breaks= "FD", freq=1)
+h <- hist(estad, breaks= "FD", freq=1,main = "Histograma estadistico")
 ```
 
 

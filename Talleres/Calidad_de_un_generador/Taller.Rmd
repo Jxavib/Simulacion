@@ -1,30 +1,97 @@
 ---
 title: "Calidad de un Generador"
-author: "Burbano Joel"
-date: "17/6/2021"
-output: html_document
+author: "Beltran Henry, Burbano Joel, Guaman Ronny"
+date: "21/6/2021"
+output:
+  html_document: default
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+## 8.  Considera el generador congruencial definido por: 
+$$\begin{aligned}x_{n+1}  & =(65x_{n}+1)\ \operatorname{mod}\ 2048,\nonumber\\
+    u_{n+1}  & =\frac{x_{n+1}}{2048},\ n=0,1,\dots\nonumber\end{aligned}$$
+    
+```{r include=FALSE}
+a=65
+c=1
+m=2048
 ```
 
-## R Markdown
+     
+a)  **Indicar razonadamente si es de ciclo máximo.**
+    
+  verifiquemos que se cumplen las hipotesis del teorema de Knuth.
+  
+1. $c$ y $m$ son primos entre si?
+  
+  Si pues el $\operatorname{mcd}(1,2048)=1$
+    
+2. $a-1$ es multiplo de todos los factores primos de $m$
+    
+```{r eval=FALSE, include=FALSE}
+# install.packages("numbers")
+library(numbers)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+p <- primeFactors(m)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+q=m%%4
 
-```{r cars}
-summary(cars)
+
 ```
 
-## Including Plots
+Notemos que $m=2^{11}$ por tanto el factor primo de $2048$ es $2$ con multiplicidad $11$ y
+    $64$ es multiplo de $2$ por lo tanto se verifica la condición.
+    
+3. Si $m$ es multiplo de $4$ entonces $a-1$ tambien lo ha e ser
+      
+Notemos que $2048\operatorname{Mod}(4)=0$ y $64\operatorname{Mod}(4)=0$
+por tanto se verifica la condición
+    
+Por 1 ,2 ,3 concluimos que el ciclo es máximo.
+  
 
-You can also embed plots, for example:
+b)  **Generar 1000 valores tomando como semilla inicial el n de grupo multiplicado por 100 y obtener el tiempo de CPU. Representar gráficamente el ajuste a la densidad teórica y realizar el correspondiente contraste de Kolmogorov-Smirnov.**
+```{r echo=FALSE}
+source("RANDC.R")
+initRANDC(400, a, c, m) # Establecer semilla y parámetros
+nsim <-1000
+system.time(u <- RANDCN(nsim)) # Generar
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r echo=FALSE}
+source("Diagnosis contrastes.r")
+```
+
+ 
+c)  **Representar los pares de datos $\left( u_{i}, u_{i+1} \right)$, ¿se observa algún problema?.**
+
+```{r}
+v=u[-1]
+v <- c(v,1)
+z <-cbind(u,v)
+plot(z)
+```
+
+
+d)  **Estudiar la aleatoriedad de este generador empleando repetidamente el test de Ljung-Box, considerando 500 pruebas con muestras de tamaño 50 y hasta el salto 10 (`Box.test(u,lag=10, type=Ljung)`). Comparar el ajuste de las distribuciones del estadístico y $p$-valor a las de referencia.**
+
+```{r echo=TRUE}
+initRANDC(400,a,c,m)
+npruebas <- 500
+Tmuestra <- 50
+pval <- rep(0,npruebas)
+estad <- rep(0,npruebas)
+for( i in 1:npruebas){
+u <- RANDCN(Tmuestra)
+jbu <- Box.test(u,lag=10,type="Ljung")
+pval[i] <- jbu$p.value
+estad[i] <- jbu$statistic
+}
+hist(pval, freq=F)
+```
+```{r include=TRUE}
+h <- hist(estad, breaks= "FD", freq=1)
+```
+
+

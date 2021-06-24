@@ -29,6 +29,11 @@ rdcauchyn <- function(n = 1000, pi) {
     return(x)
 }
 
-
 ```
+
+```{r include=FALSE}
+set.seed(54321)
+system.time(x <- rdcauchyn(10^4, pi))
+```
+
 

@@ -1,16 +1,15 @@
 ---
 title: "Trabajo en clase"
-author: ',Beltran Henry, Burbano Joel, Guaman Ronny'
-date: "10/6/2021"
+author: 'Beltran Henry, Burbano Joel, Guaman Ronny'
+date: "8/6/2021"
 output:
-  pdf_document: default
   html_document: default
 ---
 
 # Simulación
 ### Simular el lanzamiento de dos datos equilibrados, y obtener la distribución teórica y empírica de la suma del resultado obtenido.
 
-$Y:$ resultado sumar dos dados 
+$Y:$ resultado sumar dos datos 
 
 Para los siguientes escenarios: $n=30,50,100$ y $m=100,500,1000$. Donde $n=$ números de lanzamiento y $m=$ número de veces que se repite el experimento.
 ```{r include=F}

@@ -1,11 +1,141 @@
 ---
 title: "Repetición de Constraste"
-author: "Burbano Joel"
+author: "Beltran Henry, Burbano Joel, Guman Ronny"
 date: "17/6/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Se considerará una prueba de hipótesis para la igualdad de varianzas (razón de varianzas) de dos poblaciones normales de tamaño n=20, para verificar bajo simulación que el p−valor tiene una distribución uniforme $U(0,1)$,es decir: $Ho:\sigma_{21}=\sigma_{22}\quad  Ha:\sigma_{21}\neq\sigma_{22}$
+
+Al aplicar un estadístico $F$ que sigue una distribución de Fisher con $(n_1−1)$ grados de libertad para el numerador y $(n_2−1)$ grados de libertad para el denominador.
+
+A continuación presentamos la función estadístico que nos ayudará al cáculo del p−valor
+
+```{r include=FALSE}
+set.seed(7654321)                                                 
+nsim<-1000                                                       
+
+estadistico<-function(x,y){                                      
+  n1<-length(x)
+  n2<-length(y)
+  s1<-sqrt(var(x))
+  s2<-sqrt(var(y))
+  F<-abs((s1^2)/(s2^2))
+  p<-pf(F, n1-1, n2-1, lower.tail=F)                                              
+}
 ```
 
+Caso 1: Tomamos $n_1=n_2=20$ y si se verifica la hipótesis nula se considera $\sigma_{21}=\sigma_{22}=\sigma=3$
+
+```{r echo=FALSE}
+sigma<-3
+n<-20
+X<-matrix(rnorm(n*nsim,6,sigma),ncol=nsim,nrow=n)
+Y<-matrix(rnorm(n*nsim,6,sigma),ncol=nsim,nrow=n)
+p<-replicate(nsim,0)
+for(i in 1:nsim){
+  p[i]=estadistico(X[,i],Y[,i])
+}
+
+hist(p,main=c("Caso1:sigma= 3"))
+```
+
+ Calculamos además el p−valor promedio:
+ 
+```{r echo=FALSE}
+
+promedio_p<-mean(p)
+promedio_p
+```
+
+```{r include=FALSE}
+obs<-p<0.05
+```
+
+Ahora podemos considerar:$n_1=n_2=40$ y si se verifica la hipótesis nula, se toma $\sigma_{21}=\sigma_{22}=\sigma=3$
+
+
+```{r echo=FALSE}
+n_nuevo<-40
+X_1<-matrix(rnorm(n*nsim,6,sigma),ncol=nsim,nrow=n_nuevo)
+Y_1<-matrix(rnorm(n*nsim,6,sigma),ncol=nsim,nrow=n_nuevo)
+p_nuevo<-replicate(nsim,0)
+for(i in 1:nsim){
+  p_nuevo[i]=estadistico(X_1[,i],Y_1[,i])
+}
+
+hist(p_nuevo,main=c("Caso2:sigma= 3"))
+```
+
+
+ El p−valor promedio es:
+ 
+```{r echo=FALSE}
+w_1=mean(p_nuevo)
+w_1
+```
+
+
+Ahora vemos el caso 2: $\sigma_{21}\neq\sigma_{22}$.Elegimos $\sigma_{21}=3$ y $\sigma_{22}=4$. Para $n_1=n_2=20$:
+
+```{r echo=FALSE}
+sigma_1<-3
+sigma_2<-4
+n_2<-20
+X_2<-matrix(rnorm(n*nsim,6,sigma_1),ncol=nsim,nrow=n_2)
+Y_2<-matrix(rnorm(n*nsim,6,sigma_2),ncol=nsim,nrow=n_2)
+p_2<-replicate(nsim,0)
+for(i in 1:nsim){
+  p_2[i]=estadistico(X_2[,i],Y_2[,i])
+}
+
+hist(p_2,main=c("Caso1:sigma1= 3 y sigma2=4"))
+```
+
+ Con el pvalor promedio:
+ 
+```{r echo=FALSE}
+w_2=mean(p_2)
+w_2
+```
+
+Para poder observar la potencia de la prueba, aproximaremos la misma por simulación, donde tomaremos muestras de tamaño $n=10,20,50$ y tomaremos y como el vector de las aproximaciones para la potencia.
+
+
+```{r}
+potencia<- function(sigma1,sigma2,n,alpha=0.05){
+  m=length(sigma1)
+  y<-replicate(m,0)
+  for(j in 1:m){
+    X<-matrix(rnorm(n*nsim,6,sigma1[j]),ncol=nsim,nrow=n)
+    Y<-matrix(rnorm(n*nsim,6,sigma2[j]),ncol=nsim,nrow=n)
+    p<-replicate(nsim,0)
+    for(i in 1:nsim){
+    p[i]=estadistico(X[,i],Y[,i])
+    }
+    #x <- p<alpha
+    #x_sel <- p[x]
+    y[j] <- mean(p)
+  }
+  return(y)
+}
+sigma11<- 1:7
+sigma21<- 7:1
+x_potencia<-sigma11/sigma21
+n <-10; n1<-20; n2<-50
+alpha <- 0.05
+```
+
+Gráficos de las curvas de potencias:
+
+```{r echo=FALSE}
+plot(x_potencia,potencia(sigma11,sigma21,n),type = "l", col = 2,main = "Curva de Potencia, Alpha=0.05 y n=10", xlab = "Razón de varianzas", ylab = "Potencia (1-beta)")
+```
+
+```{r echo=FALSE}
+plot(x_potencia,potencia(sigma11,sigma21,n1),type = "l", col = 2,main = "Curva de Potencia, Alpha=0.05 y n=10", xlab = "Razón de varianzas", ylab = "Potencia (1-beta)")
+```
+
+```{r echo=FALSE}
+plot(x_potencia,potencia(sigma11,sigma21,n2),type = "l", col = 2,main = "Curva de Potencia, Alpha=0.05 y n=10", xlab = "Razón de varianzas", ylab = "Potencia (1-beta)")
+```

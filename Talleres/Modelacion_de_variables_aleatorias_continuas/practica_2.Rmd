@@ -4,4 +4,6 @@ author: ",Beltran Henry, Burbano Joel, "
 date: "24/6/2021"
 output: html_document
 ---
+Ejercicio 4
 
+Escribir el código necesario para generar, por el método de inversión, una muestra de $n$ observaciones de una distribución de Cauchy.

@@ -3,8 +3,8 @@ title: "Trabajo en clase"
 author: ',Beltran Henry, Burbano Joel, Guaman Ronny'
 date: "10/6/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 # Simulación

@@ -1,0 +1,7 @@
+---
+title: "Practica 2"
+author: ",Beltran Henry, Burbano Joel, "
+date: "24/6/2021"
+output: html_document
+---
+

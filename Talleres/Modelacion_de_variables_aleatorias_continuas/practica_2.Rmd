@@ -5,3 +5,35 @@ date: "24/6/2021"
 output: html_document
 ---
 
+```{r include=FALSE}
+ddcauchy <- function(x, pi){
+# Densidad Cauchy
+  1/(pi*(1-x^2))
+}
+
+rdcauchy <- function(pi){
+# Simulaci?n por inversi?n
+# Doble exponencial
+  U <- runif(1)
+  if (U<0.5) {
+    return(tan(pi*(U-0.5)))
+  } else {
+    return(tan(pi*U))
+  }
+}
+
+rdcauchyn <- function(n = 1000, pi) {
+# Simulaci?n n valores de doble exponencial
+    x <- numeric(n)
+    for(i in 1:n) x[i]<-rdcauchy(pi)
+    return(x)
+}
+
+```
+
+```{r include=FALSE}
+set.seed(54321)
+system.time(x <- rdcauchyn(10^4, pi))
+```
+
+

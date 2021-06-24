@@ -1,3 +1,4 @@
+
 ---
 title: "Taller2"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"

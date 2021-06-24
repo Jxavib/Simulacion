@@ -4,6 +4,7 @@ author: 'Beltran Henry, Burbano Joel, Guaman Ronny'
 date: "8/6/2021"
 output:
   html_document: default
+  pdf_document: default
 ---
 
 # Simulación

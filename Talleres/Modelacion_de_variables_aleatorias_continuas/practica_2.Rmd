@@ -5,6 +5,44 @@ date: "24/6/2021"
 output: html_document
 ---
 
+### Ejercicios de fin de práctica
+
+4. Escribir el codigo necesario para generar, por el método de inversión, una muestra de $n$ observaciones de una distribución Cauchy.
+
+```{r include=T}
+# Distribuci?n de Cauchy por inversi?n
+
+rcauchyn <- function(n = 1000) {
+# Simulaci?n n valores de distribuci?n de Cauchy
+    return(tan(pi*runif(n)))
+}
+```
+
+
+a) Generar una muestra de $10^4$ observaciones y obtener el tiempo de CPU.
+
+```{r echo=F}
+set.seed(1)
+nsim <- 10^4
+system.time(x <- rcauchyn(nsim))
+```
+
+b) Representar el histograma (limitar el rango, e.g. ``xlim=c(-10,10)``) y compararlo con densidad teórica.
+
+```{r echo=F}
+hist(x, breaks = "FD", freq = FALSE, xlim=c(-10,10))
+curve(dcauchy(x), add = TRUE)
+```
+
+c) Obtener conclusiones sobre la existencia de una media teórica a partir de la media muestral aproximada por simulación (estudiar la convergencia de la media muestral ). Suponiendo que el vector x contiene las simulaciones, estudiar la convergencia de la media muestralmediante el gráfico :
+``plot(1:nsim,cumsum(x)/(1:nsim), type="1", ylab="Media muestral",xlab="N° de simulaciones")``
+
+```{r echo=F}
+plot(1:nsim, cumsum(x)/(1:nsim), type="l", ylab="Media muestral", xlab="N° de simulaciones")
+```
+
+
+
 ```{r include=FALSE}
 ddcauchy <- function(x, pi){
 # Densidad Cauchy

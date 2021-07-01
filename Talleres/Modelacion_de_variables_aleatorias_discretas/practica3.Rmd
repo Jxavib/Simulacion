@@ -1,0 +1,204 @@
+---
+title: "Practica 3"
+author: "Beltran Henry, Burbano Joel, Guaman Ronny"
+date: "1/7/2021"
+output: html_document
+---
+# Métodos Universales para la simulación de variables discretas
+
+***6. Se pretende simular valores de una distribución $Bi(10,0.5)$. Para ello***
+
+  ***a) Generar por el método de la transformación cuantil usando busqueda secuencial, una muestra de $nsim=10^5$ observaciones de esta variable. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad,  representarla gráficamente y compararla con la teórica. Calcular tambien la media muestral (compararla con la teórica $np$) y el número medio de comparaciones para generar cada observación.***
+  
+```{r}
+# Implementamos el algoritmo de transformación cuantil con busqueda sequencial.
+
+
+rfmp <- function(x,prob=1/length(x),nsim=1000){
+  Fx <- cumsum(prob)
+  # simular
+  X <- numeric(nsim)  #creamos un vector de indices
+  U <- runif(nsim)   #creamos un vector de probilidad uniforme
+  ncomp <- 0 
+  for(j in 1:nsim){
+    i <- 1
+    while(Fx[i]<U[j]) i <- i+1
+    X[j] <- x[i]
+    ncomp<<-ncomp+ i
+  }
+  return(X)
+}
+```
+
+Ahora epleando la rutina anterior generamos las simulaciones:
+
+```{r}
+set.seed(54321)
+n <- 10
+p <- 0.5
+nsim <- 10^5
+x <- 0:n   # crea un arreglo de n+1 componentes 0,1,2,..
+fmp <- dbinom(x,n,p) # crea un arreglo de la funcion de mas de probabilidad
+ncomp <- 0  # regresa el valor de ncomp a 0
+system.time(rx <- rfmp(x,fmp,nsim)) # calcula el tiempo en sgundos que toma ejecutar una expresion(en este caso rfmp)
+
+```
+
+Aproximación de la media 
+
+```{r}
+mean(rx)
+```
+
+El valor teórico es $n*p=5$
+
+La presición que se ha obtenido es 
+
+```{r}
+abs(mean(rx)-n*p)
+```
+
+Número medio de comparaciones:
+
+```{r}
+ncomp/nsim
+```
+
+Analisís de los resultados 
+
+```{r}
+res <- table(rx)/nsim    # crea una tabla con lo elementos de rx y los divide para nsim
+plot(res, ylab="frequencia relatica", xlab="valores") #grafica los valores simulados
+points(x,fmp,pch=4,col='blue') #grafica los valores teoricos
+```
+
+```{r}
+res <- as.data.frame(res) # mutamos res a un data frame
+names(res) <- c('x','psim')  #asignamos nombres a las columnas del data frame
+res$pteor <- fmp   # creamos una nueva columna a la cual le asiganamos los valores de fmp
+res
+```
+
+Ahora vemos que sucede con los errores
+
+Error absoluto
+
+```{r}
+max(abs(res$psim-res$pteor))
+```
+
+Error Relativo
+
+```{r}
+max(abs(res$psim-res$pteor) /res$pteor)
+```
+
+```{r include=F}
+# NOTA: Puede ocurrir que no todos los valores sean generados en la simulación
+# Si length(x) > length(psim) el código anterior (res$pteor <- fmp) producirá un error
+# Alternativamente:
+psim <- rep(0, length(x))
+names(psim) <- as.character(x)
+psim[as.character(res$x)] <- res$psim
+psim
+res <- data.frame(x=x, pteor=fmp, psim =psim)
+res
+
+```
+
+  ***b) Repetir el apartao anterior ordenando previamente las probabilidades en orden decreciente y tambien empleando la funcion sample de*** ``R``
+  
+```{r}
+tini <- proc.time()  # permite obtener tiempo de computacion real y de CPU
+
+ncomp <- 0  # regresamos a 0 el valor de ncomp
+ind <- order(fmp,decreasing = T)   #creamos un vector de indices de fmp ordenada de manera decrciente
+rx <- rfmp(x[ind],fmp[ind],nsim) # llamamos a la funcion rfmp
+
+tiempo <- proc.time()-tini
+tiempo 
+```
+
+Numero de comparaciones 
+
+```{r}
+ncomp/nsim
+```
+
+Valor teorico
+
+```{r}
+sum((1:length(x))*fmp[ind])
+```
+
+Empleando la función ``sample(x)``
+
+```{r}
+system.time(rx <- sample(x,nsim,replace = T,prob = fmp))
+```
+
+```{r include=F}
+# -------------------------------
+# Si n >> 30
+# Aproximación normal con corrección continuidad
+mean <- n*p
+sd <- sqrt(n*p*(1-p))
+
+res$pnorm <- pnorm(x+0.5,mean,sd)-pnorm(x-0.5,mean,sd)
+res
+max(abs(res$pnorm - res$pteor))
+max(abs(res$pnorm - res$pteor) / res$pteor)
+
+system.time(
+rx <- pmax(0, pmin(n, round( rnorm(nsim, mean, sd) )))
+)
+
+table(rx)/nsim
+```
+
+```{r include=F}
+# Realmente las prob de los extremos serían mayores...
+res$pnorm[1] <- pnorm(0.5, mean, sd)
+res$pnorm[n+1] <- 1 - pnorm(n-0.5, mean, sd)
+```
+
+  ***c) Diseñar una rutina que permita generar $nsim$ valores de una distribución discreta usando una tabla guía. Repetir los pasos de los apartados anteriores empleando esta rutina (con $m=n-1$). Comparar los resultados obtenidos.***
+
+Primero se implementara el algoritmo en ``R``
+
+```{r}
+rfmp.tabla <- function(x,prob=1/length(x),m,nsim=1000){
+  Fx <- cumsum(prob)
+  g <- rep(1,m)  #generamos una lista de m veces 1
+  i <- 1
+  for(j in 2:m){
+    while (Fx[i]<(j-1)/m)  i <- i+1
+    g[j] <- i
+  }
+  X <- numeric(nsim)  #creamos un vector de indices
+  U <- runif(nsim)   #creamos un vector cuyas entradas son valores de un distribucion uniforme
+  for(j in 1:nsim){
+    i <- g[floor(U[j]*m)+1]
+    while (Fx[i]<U[j]) i <- i+1
+    X[j] <- x[i]
+  }
+  return(X)
+}
+```
+
+Tiempo de ejecución
+
+```{r}
+system.time(rx <- rfmp.tabla(x,fmp,n-1,nsim))
+```
+
+Ánalisis de los resultados:
+
+```{r}
+res <- table(rx)/nsim
+plot(res, ylab = "frecuencia relativa", xlab = "valores")
+points(x,fmp,pch=4,col='blue')
+```
+
+
+

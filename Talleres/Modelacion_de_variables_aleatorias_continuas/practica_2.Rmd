@@ -1,162 +1,171 @@
 ---
-title: "Practica 2"
-author: ",Beltran Henry, Burbano Joel, Guaman Ronny"
+title: "Simulación de variables Aleatorias. Metódo de inversión y aceptación-rechazo."
+author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "24/6/2021"
 output: html_document
 ---
-
 ### Ejercicios de fin de práctica
 
 **4. Escribir el codigo necesario para generar, por el método de inversión, una muestra de $n$ observaciones de una distribución Cauchy.**
 
-```{r include=T}
-# Distribuci?n de Cauchy por inversi?n
+a.Generar una muestra de $10^4$ observaciones y obtener el tiempo de CPU.
 
-rcauchyn <- function(n = 1000) {
-# Simulaci?n n valores de distribuci?n de Cauchy
-    return(tan(pi*runif(n)))
-}
-```
+Consideramos primero el siguiente código:
 
-
-**a) Generar una muestra de $10^4$ observaciones y obtener el tiempo de CPU.**
-
-```{r echo=F}
-set.seed(1)
-nsim <- 10^4
-system.time(x <- rcauchyn(nsim))
-```
-
-**b) Representar el histograma (limitar el rango, e.g. ``xlim=c(-10,10)``) y compararlo con densidad teórica.**
-
-```{r echo=F}
-hist(x, breaks = "FD", freq = FALSE, xlim=c(-10,10))
-curve(dcauchy(x), add = TRUE)
-```
-
-**c) Obtener conclusiones sobre la existencia de una media teórica a partir de la media muestral aproximada por simulación (estudiar la convergencia de la media muestral ). Suponiendo que el vector x contiene las simulaciones, estudiar la convergencia de la media muestralmediante el gráfico:**
-``plot(1:nsim,cumsum(x)/(1:nsim), type="1", ylab="Media muestral",xlab="N° de simulaciones")``
-
-```{r echo=F}
-plot(1:nsim, cumsum(x)/(1:nsim), type="l", ylab="Media muestral", xlab="N° de simulaciones")
-```
-
-
-
-```{r include=FALSE}
-ddcauchy <- function(x, pi){
-# Densidad Cauchy
-  1/(pi*(1-x^2))
+```{r}
+ddcauchy <- function(x){ #Función densidad f
+  1/(pi*(1+x^2))
 }
 
-rdcauchy <- function(pi){
-# Simulaci?n por inversi?n
-# Doble exponencial
+rdcauchy <- function(){
+  # Simulación por inversión
   U <- runif(1)
-  if (U<0.5) {
-    return(tan(pi*(U-0.5)))
-  } else {
-    return(tan(pi*U))
+  return(tan(pi*(U-0.5)))#Inversa
+}
+
+rdcauchyn <- function(n = 10000){
+  # Simulación n valores de la distribución de Cauchy
+  x <- numeric(n) #vector del números con n elementos
+  for(i in 1:n) x[i]<-rdcauchy()
+  return(x)
+}
+
+set.seed(1)
+system.time(x <- rdcauchyn(10000))
+
+```
+
+b) Representar el histograma (limitar el rango, e.g. $xlim = c(-10, 10)$) y compararlo con la densidad teórica $(dcauchy)$.
+
+```{r}
+hist(x,breaks = "FD", freq = FALSE,xlim = c(-10, 10))
+curve(ddcauchy(x), add = TRUE)
+```
+
+
+c) Obtener conclusiones sobre la existencia de una media teórica a partir de la media muestral aproximada por simulación (estudiar la convergencia de la media muestral ). Suponiendo que el vector x contiene las simulaciones, estudiar la convergencia de la media muestralmediante el gráfico:
+$plot(1:nsim,cumsum(x)/(1:nsim), type="1", ylab="Media muestral",xlab="N° de simulaciones")$
+
+```{r}
+nsim=10000
+plot(1:nsim, cumsum(x)/(1:nsim), type="l", ylab="Media muestral", xlab="No de
+simulaciones")
+```
+
+Con esto podemos ver la distribucion de cauchy no tiene una media muestral a la que converge
+
+
+
+**5. El tiempo de respuesta (en centésimas de segundo) de un servidor de bases de datos es una variable con función de densidad:**
+$$
+\begin{aligned}
+f(x)= xe^{-x} \quad si \quad x\geq0 
+\end{aligned}
+$$
+**Escribir el código necesario para generar, por el método de aceptación-rechazo, una muestra de n observaciones de esta distribución empleando como densidad auxiliar una exponencial:**
+$$
+\begin{aligned}
+g(x)= \lambda e^{-\lambda x} \quad si \quad x\geq0 
+\end{aligned}
+$$
+
+
+a)  Aproximar numéricamente el parámetro óptimo $(\lambda_{opt} < 1)$ y la cota óptima $(c_{opt})$ de la densidad auxiliar y compararlos con los valores teóricos: $\lambda_{opt} = \frac{1}{2}$ y $c_{opt} = \frac{4}{e}$.
+
+Obtengamos $c$ óptimo y $\lambda$ óptimo
+```{r}
+f1 <- function(x=1){ 
+  y <- numeric(1)
+   if(x>=0){
+    y <- x*exp(-x)  
   }
+  return(y)
 }
-
-rdcauchyn <- function(n = 1000, pi) {
-# Simulaci?n n valores de doble exponencial
-    x <- numeric(n)
-    for(i in 1:n) x[i]<-rdcauchy(pi)
-    return(x)
-}
-
-```
-
-```{r include=FALSE}
-set.seed(54321)
-system.time(x <- rdcauchyn(10^4, pi))
-```
-
-**5. Eltiempo de respuesta (en centésimas de segundo) de un servidor de bases de datos en una variable con función de densidad:**
-$$f(x)=xe^{-x}\quad \text{si }~x\geq0$$
-
-**Escribir el código necesario para generar,por el método de aceptación rechazo, una muestra de $n$ observaciones de esta distribucion empleando como densidad auxiliar una exponencial:**
-$$g(x)=\lambda e^{-\lambda x} \quad \text{si }~ x\geq 0$$
-```{r include=F}
-dtiempo <- function(x) ifelse(x > 0, x * exp(-x), 0)
-curve(dtiempo, 0, 10)
-
-lambda.opt <- 0.5
-c.opt <- 4/exp(1)
-
-rtiempoAR <- function() {
-# Simulaci?n por aceptaci?n-rechazo
-# dtiempo a partir de exponencial
-  while (TRUE) {
-    U <- runif(1)
-    X <- rexp(1, lambda.opt)
-    ngen <<- ngen + 1 # Comentar esta l?nea para uso normal
-    if (c.opt * U * dexp(X, lambda.opt) <= dtiempo(X)) return(X)
+g <- function(x=1, lambda=1){
+  if(x>=0){
+    y <- lambda* exp(-lambda*x)
   }
+  return(y)
 }
 
-rtiempoARn <- function(n=1000) {
-# Simulaci?n n valores dtiempo
-    x <- numeric(n)
-    ngen <<- 0 # Comentar esta l?nea para uso normal
-    for(i in 1:n) x[i]<-rtiempoAR()
-    return(x)
-}
-
-```
-
-```{r echo=F}
-# Grafico
-curve(c.opt * dexp(x, lambda.opt), ylab = "c*g(x)", xlim=c(0, 10), lty = 2)
-curve(dtiempo(x), add = TRUE)
-```
-
-
-
-**a) Aproximar numéricamente el parámetro óptimo $(\lambda_{opt}<1)$ y la cota óptima $(c_{opt})$ de la densidad auxiliar y compararlos con los valores teóricos: $\lambda_{opt}=1/2 \quad \text{y}\quad c_{opt}=4/e$**
-
-
-```{r echo=F}
-# Obtenci?n de un valor c ?ptimo aproximado
-# NOTA: a partir del gr?fico del encabezado se deduce que en x=+-2 se obtiene el m?ximo
-optimize(f=function(x){dtiempo(x)/dexp(x, lambda.opt)}, maximum=TRUE, interval=c(1,3))$objective
-# Valor ?ptimo real
-c.opt
-
-
-# Obtenci?n de valores c y lambda ?ptimos aproximados
 fopt <- function(lambda) {
-# Obtiene c fijado lambda
-  optimize(f=function(x){dtiempo(x)/dexp(x,lambda)}, maximum=TRUE, interval=c(1,3))$objective
+  # Obtiene c fijado lambda
+  optimize(f = function(x){f1(x)/g(x,lambda)},
+           maximum=TRUE, interval=c(0,2))$objective
 }
 
 # Encontar lambda que minimiza
-optimize(f = function(x){fopt(x)}, interval = c(0.1,1))
-
+res <- optimize(f=function(x){fopt(x)}, interval=c(0,2))
+lambda.opt <- res$minimum
+c.opt <- res$objective
 ```
 
-**b) Generar una muestra de $1000$ observaciones de la distribución de interés tomando como semilla inicial los cuatro primeros digitos del DNI. obtener el tiempo de CPU que tarda en generar la secuencia y calcular el número medio de generaciones de la distribución auxiliar.**
+Ahora los comparamos con los valores teóricos
+```{r}
+#Para c óptimo
+abs(c.opt-(4/exp(1)))
+#Para lambda óptimo
+abs(lambda.opt-0.5)
+```
 
-```{r echo=F}
-set.seed(54321)
-nsim <- 10^4
+Vemos que en ambos casos obtenemos una aproximación bastante buena.
 
-ngen <- 0
-system.time(x <- rtiempoARn(nsim))
-# N? generaciones
+b)  Generar una muestra de $1000$ observaciones de la distribución de interés tomando como semilla inicial los cuatro primeros dígitos del DNI. Obtener el tiempo de CPU que tarda en generar la secuencia y calcular el número medio de generaciones de la distribución auxiliar.
+
+Para ello generemos el método de aceptación y rechazo 
+```{r}
+#Simulación por inversión
+#Exponencial
+rdexp <- function(lambda=1){
+  U <- runif(1)
+  return(-log(1-U)/lambda)
+}
+
+rf1Distr <- function() {
+# Simulación por aceptación-rechazo
+# Funcion de distribución del ejercicio a partir de exponencial
+  while (TRUE) {
+    U <- runif(1)
+    X <- rdexp(lambda.opt)
+    ngen <<- ngen + 1 
+    if (c.opt*U*g(X)/f1(X) <= 1) return(X)
+  }
+}
+
+rf1 <- function(n=1000) {
+# Simulación n valores 
+    x <- numeric(n)
+    ngen <<- 0 
+    for(i in 1:n) x[i]<-rf1Distr()
+    return(x)
+}
+curve((4/exp(1))*dexp(x), ylab = "c*g(x)", xlim=c(0,4), lty = 2)
+curve(expr = f1,from = 0, to = 4,n = 100, add = TRUE)
+```
+
+Por tanto generemos una muestra de $1000$ observaciones
+
+```{r}
+set.seed(1722)
+nsim <- 1000
+
+
+system.time(x <- rf1(nsim))
+# Nº generaciones
 {
-cat("\nN? de generaciones = ", ngen)
-cat("\nN? medio de generaciones = ", ngen/nsim)
-cat("\nProporci?n de rechazos = ", 1-nsim/ngen, "\n")
+cat("\nNº de generaciones = ", ngen)
+cat("\nNº medio de generaciones = ", ngen/nsim)
+cat("\nProporción de rechazos = ", 1-nsim/ngen, "\n")
 }
 ```
 
-**c) Representar el histograma y compararlo con la densidad teórica.**
 
-```{r echo=F}
+c) Representar el histograma y compararlo con la densidad teórica.
+
+```{r}
 hist(x, breaks="FD", freq=FALSE)
-curve(dtiempo(x), add=TRUE)
+curve(expr = f1,from = 0, to = 12,n = 100, add = TRUE)
 ```
+
+
 

@@ -239,8 +239,9 @@ ncomp/nsim
 Analisís de los resultados 
 
 ```{r}
-res <- table(hx)/nsim    # crea una tabla con lo elementos de hx y los divide para nsim
-plot(res, ylab="frequencia relatica", xlab="valores") #grafica los valores simulados
+res <- as.data.frame(table(rx)/nsim)
+names(res) <- c("x", "psim")
+plot(as.matrix(res), type="h")
 points(x,fmp,pch=4,col='blue') #grafica los valores teoricos
 ```
 
@@ -248,9 +249,11 @@ points(x,fmp,pch=4,col='blue') #grafica los valores teoricos
 # 
 #  Verificar este parte del codigo surje un problema como se menciona en la teoria
 # 
-res <- as.data.frame(res) # mutamos res a un data frame
-names(res) <- c('x','psim')  #asignamos nombres a las columnas del data frame
-res$pteor <- fmp   # creamos una nueva columna a la cual le asiganamos los valores de fmp
+psim <- rep(0, length(x))
+names(psim) <- as.character(x)
+psim[as.character(res$x)] <- res$psim
+psim
+res <- data.frame(x=x, pteor=fmp, psim =psim)
 res
 ```
 

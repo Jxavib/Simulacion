@@ -200,5 +200,148 @@ plot(res, ylab = "frecuencia relativa", xlab = "valores")
 points(x,fmp,pch=4,col='blue')
 ```
 
+***7. Se pretende simular $nsim=10^4$ observaciones de una variable hypergemotrica (``dhyper(x,m,n,k)``) de parametros $m=$ dos últimas cifras del DNI , $n=100-m$ y $k=20$.***
+  
+  ***a) Generar los valores empleando el método de la tranformación cuantil usando busqueda sequencial. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad, representarla graficamente y compararla con la teórica. Calcular también la media muestral (compararla con la teórica $km/(m+n)$) y el número medio de comparaciones para generar cada observación.
+  
+```{r}
+set.seed(54321)
+m <- 46
+n <- 100-m
+k <- 20
+nsim <- 10^4
 
+x <- 0:n
+fmp <- dhyper(x,m,n,k)
+
+ncomp <- 0  #ponemos en 0 ncomp
+
+system.time(hx <- rfmp(x,fmp,nsim))
+```
+
+Aproximación de la media
+
+```{r}
+mean(hx)
+```
+
+El valor teorico es $km/(m+n)$
+```{r}
+k*m/(m+n)
+```
+
+Número de comparaciones
+
+```{r}
+ncomp/nsim
+```
+
+Analisís de los resultados 
+
+```{r}
+res <- table(hx)/nsim    # crea una tabla con lo elementos de hx y los divide para nsim
+plot(res, ylab="frequencia relatica", xlab="valores") #grafica los valores simulados
+points(x,fmp,pch=4,col='blue') #grafica los valores teoricos
+```
+
+```{r eval=FALSE, include=FALSE}
+# 
+#  Verificar este parte del codigo surje un problema como se menciona en la teoria
+# 
+res <- as.data.frame(res) # mutamos res a un data frame
+names(res) <- c('x','psim')  #asignamos nombres a las columnas del data frame
+res$pteor <- fmp   # creamos una nueva columna a la cual le asiganamos los valores de fmp
+res
+```
+
+  ***b) Repetir el apartado anterior ordenando previamente las probabilidades en orden decreciente, tambien empleando la función ``sample()`` de ``R`` y empleando una tabla guía (con $k-1$ subintervalos)***
+  
+  
+```{r}
+tini <- proc.time()  # permite obtener tiempo de computacion real y de CPU
+
+ncomp <- 0  # regresamos a 0 el valor de ncomp
+ind <- order(fmp,decreasing = T)   #creamos un vector de indices de fmp ordenada de manera decrciente
+rx <- rfmp(x[ind],fmp[ind],nsim) # llamamos a la funcion rfmp
+
+tiempo <- proc.time()-tini
+tiempo 
+```
+
+Numero de comparaciones 
+
+```{r}
+ncomp/nsim
+```
+
+Valor teorico
+
+```{r}
+sum((1:length(x))*fmp[ind])
+```
+
+Empleando la función ``sample(x)``
+
+```{r}
+system.time(rx <- sample(x,nsim,replace = T,prob = fmp))
+```
+
+Empleando una tabla guía 
+
+Tiempo de ejecución
+
+```{r}
+system.time(rx <- rfmp.tabla(x,fmp,n-1,nsim))
+```
+
+Ánalisis de los resultados:
+
+```{r}
+res <- table(rx)/nsim
+plot(res, ylab = "frecuencia relativa", xlab = "valores")
+points(x,fmp,pch=4,col='blue')
+```
+
+  ***c) Diseñar una rutina que permita generar $nsim$ valores de una distribución discreta usando el método de Alias. Repetir los pasos de los apartados anteriores empleando esta rutina comparar los resultados obtenidos.***
+  
+Primero implementamos el algoritmo Alias en ``R``
+
+```{r}
+rfmp.alias <- function(x,prob=1/length(x),nsim=1000){
+  # Inicializamos las tablas
+  a <- numeric(length(x)) 
+  q <- prob*length(x)
+  low <- q < 1
+  high <- which(!low)
+  low <- which(low) 
+  while (length(high) && length(low)){
+    l <- low[1]
+    h <- high[1]
+    a[l] <- h
+    q[h] <- q[h]-(1-q[l])
+    if (q[h]<1){
+      high <- high[-1]
+      low[1] <- h
+    } else low <- low[-1]
+  }
+  # Generación de valores
+  V <- runif(nsim)
+  i <- floor(runif(nsim)*length(x))+1
+  return(x[ifelse(V<q[i],i,a[i])])
+}
+```
+
+Tiempo de ejecución empleando Alias
+
+```{r}
+system.time(hx <- rfmp.alias(x,fmp,nsim))
+```
+
+Análisis de los resultados:
+
+```{r}
+res <- table(hx)/nsim
+plot(res,ylab="frecuencia relativa", xlab = "valores")
+points(x,fmp,pch=4,col='blue')
+```
 

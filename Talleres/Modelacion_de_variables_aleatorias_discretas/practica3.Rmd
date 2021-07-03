@@ -202,7 +202,7 @@ points(x,fmp,pch=4,col='blue')
 
 ***7. Se pretende simular $nsim=10^4$ observaciones de una variable hypergeometrica (``dhyper(x,m,n,k)``) de parametros $m=$ dos últimas cifras del DNI , $n=100-m$ y $k=20$.***
   
-  ***a) Generar los valores empleando el método de la tranformación cuantil usando busqueda sequencial. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad, representarla graficamente y compararla con la teórica. Calcular también la media muestral (compararla con la teórica $km/(m+n)$) y el número medio de comparaciones para generar cada observación.
+  ***a) Generar los valores empleando el método de la tranformación cuantil usando busqueda sequencial. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad, representarla graficamente y compararla con la teórica. Calcular también la media muestral (compararla con la teórica $km/(m+n)$) y el número medio de comparaciones para generar cada observación.***
   
 ```{r}
 set.seed(54321)
@@ -226,6 +226,7 @@ mean(hx)
 ```
 
 El valor teorico es $km/(m+n)$
+
 ```{r}
 k*m/(m+n)
 ```
@@ -239,7 +240,7 @@ ncomp/nsim
 Analisís de los resultados 
 
 ```{r}
-res <- as.data.frame(table(rx)/nsim)
+res <- as.data.frame(table(hx)/nsim)
 names(res) <- c("x", "psim")
 plot(as.matrix(res), type="h")
 points(x,fmp,pch=4,col='blue') #grafica los valores teoricos

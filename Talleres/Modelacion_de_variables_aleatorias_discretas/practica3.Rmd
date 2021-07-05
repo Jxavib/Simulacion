@@ -2,7 +2,10 @@
 title: "Practica 3"
 author: "Beltran Henry, Burbano Joel, Guaman Ronny"
 date: "1/7/2021"
-output: html_document
+output: 
+  html_document: 
+    theme: cerulean
+    highlight: zenburn
 ---
 # Métodos Universales para la simulación de variables discretas
 
@@ -10,7 +13,7 @@ output: html_document
 
   ***a) Generar por el método de la transformación cuantil usando busqueda secuencial, una muestra de $nsim=10^5$ observaciones de esta variable. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad,  representarla gráficamente y compararla con la teórica. Calcular tambien la media muestral (compararla con la teórica $np$) y el número medio de comparaciones para generar cada observación.***
   
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Implementamos el algoritmo de transformación cuantil con busqueda sequencial.
 
 
@@ -30,7 +33,7 @@ rfmp <- function(x,prob=1/length(x),nsim=1000){
 }
 ```
 
-Ahora epleando la rutina anterior generamos las simulaciones:
+Ahora empleando la rutina anterior generamos las simulaciones:
 
 ```{r}
 set.seed(54321)
@@ -106,7 +109,7 @@ res
 
 ```
 
-  ***b) Repetir el apartao anterior ordenando previamente las probabilidades en orden decreciente y tambien empleando la funcion sample de*** ``R``
+  ***b) Repetir el apartado anterior ordenando previamente las probabilidades en orden decreciente y tambien empleando la función sample de*** ``R``
   
 ```{r}
 tini <- proc.time()  # permite obtener tiempo de computacion real y de CPU
@@ -245,6 +248,7 @@ names(res) <- c("x", "psim")
 plot(as.matrix(res), type="h")
 points(x,fmp,pch=4,col='blue') #grafica los valores teoricos
 ```
+
 
 ```{r eval=FALSE, include=FALSE}
 # 

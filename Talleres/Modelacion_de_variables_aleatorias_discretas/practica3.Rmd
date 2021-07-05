@@ -11,7 +11,7 @@ output:
 
 ***6. Se pretende simular valores de una distribución $Bi(10,0.5)$. Para ello***
 
-  ***a) Generar por el método de la transformación cuantil usando busqueda secuencial, una muestra de $nsim=10^5$ observaciones de esta variable. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad,  representarla gráficamente y compararla con la teórica. Calcular tambien la media muestral (compararla con la teórica $np$) y el número medio de comparaciones para generar cada observación.***
+  ***a) Generar por el método de la transformación cuantil usando busqueda secuencial, una muestra de $nsim=10^5$ observaciones de esta variable. Obtener el tiempo de CPU empleado. Aproximar por simulación la función de masa de probabilidad,  representarla gráficamente y compararla con la teórica. Calcular también la media muestral (compararla con la teórica $np$) y el número medio de comparaciones para generar cada observación.***
   
 ```{r message=FALSE, warning=FALSE}
 # Implementamos el algoritmo de transformación cuantil con busqueda sequencial.

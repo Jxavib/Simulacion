@@ -399,7 +399,7 @@ res <- as.data.frame(table(rx)/nsim)
 names(res) <- c("x", "psim")
 
 plot(as.matrix(res), type="h")
-points(x, fmp, pch=4)
+points(x, fmp, pch=4,col='blue')
 ```
 
 
@@ -458,7 +458,7 @@ names(res) <- c("x", "psim")
 
 # Comparación teórica
 plot(as.matrix(res), type="h")
-points(x, fmp, pch=4)
+points(x, fmp, pch=4,col='blue')
 
 ```
 

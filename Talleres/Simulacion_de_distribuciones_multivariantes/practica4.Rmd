@@ -11,4 +11,4 @@ output: html_document
 
 $$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
 
-*** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.
+*** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***

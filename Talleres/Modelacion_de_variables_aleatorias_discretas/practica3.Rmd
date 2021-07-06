@@ -22,7 +22,7 @@ rfmp <- function(x,prob=1/length(x),nsim=1000){
   # simular
   X <- numeric(nsim)  #creamos un vector de indices
   U <- runif(nsim)   #creamos un vector de probilidad uniforme
-  ncomp <- 0 
+  ncomp <<- 0 
   for(j in 1:nsim){
     i <- 1
     while(Fx[i]<U[j]) i <- i+1
@@ -209,7 +209,7 @@ points(x,fmp,pch=4,col='blue')
   
 ```{r}
 set.seed(54321)
-m <- 46
+m <- 47
 n <- 100-m
 k <- 20
 nsim <- 10^4
@@ -219,28 +219,40 @@ fmp <- dhyper(x,m,n,k)
 
 ncomp <- 0  #ponemos en 0 ncomp
 
-system.time(hx <- rfmp(x,fmp,nsim))
+tiempo_cuantil<-system.time(hx <- rfmp(x,fmp,nsim))
+tiempo_cuantil
 ```
 
 Aproximación de la media
 
 ```{r}
-mean(hx)
+media_cuantil<-mean(hx)
+media_cuantil
 ```
 
 El valor teorico es $km/(m+n)$
 
 ```{r}
-k*m/(m+n)
+media_t<-k*m/(m+n)
+media_t
 ```
 
 Número de comparaciones
 
 ```{r}
-ncomp/nsim
+Ncomp_cuantil<-ncomp/nsim
+Ncomp_cuantil
 ```
 
-Analisís de los resultados 
+Número de comparaciones teórico:
+
+```{r}
+sum((1:length(x))*fmp)
+```
+
+
+
+Análisis de los resultados 
 
 ```{r}
 res <- as.data.frame(table(hx)/nsim)
@@ -266,49 +278,130 @@ res
   
   
 ```{r}
+ncomp <- 0  # regresamos a 0 el valor de ncomp
 tini <- proc.time()  # permite obtener tiempo de computacion real y de CPU
 
-ncomp <- 0  # regresamos a 0 el valor de ncomp
+
 ind <- order(fmp,decreasing = T)   #creamos un vector de indices de fmp ordenada de manera decrciente
 hx <- rfmp(x[ind],fmp[ind],nsim) # llamamos a la funcion rfmp
 
-tiempo <- proc.time()-tini
-tiempo 
+tiempo_aprox <- proc.time()-tini
+tiempo_aprox 
 ```
 
 Numero de comparaciones 
 
 ```{r}
-ncomp/nsim
+Ncomp_aprox<-ncomp/nsim
+Ncomp_aprox
 ```
 
 Valor teorico
 
 ```{r}
 sum((1:length(x))*fmp[ind])
+
+```
+
+Media aproximada 
+
+```{r}
+media_aprox<-mean(hx)
+media_aprox
 ```
 
 Empleando la función ``sample(x)``
 
 ```{r}
-system.time(hx <- sample(x,nsim,replace = T,prob = fmp))
+ncomp<-0
+tiempo_s<-system.time(hx <- sample(x,nsim,replace = T,prob = fmp))
+tiempo_s
 ```
 
-Empleando una tabla guía 
-
-Tiempo de ejecución
+y la media obtenida:
 
 ```{r}
-system.time(hx <- rfmp.tabla(x,fmp,k-1,nsim))
+Ncomp_s<-ncomp/nsim
+media_s<-mean(hx)
+media_s
 ```
 
-Ánalisis de los resultados:
+Nos damos cuenta que con la función sample practicamente no nos demoramos nada a comparación con el método utilizado en el apartado a)
+
+Por otro lado, al ordenar las probabilidades o mejor dicho encontrar la posición de las variables de x que tienen las probabilades en forma descendiente, se tiene un mejor tiempo que al que se tiene en el literal a)
+
+Podemos comparar la media teórica con la media de las simulaciones usando la función sample
+y con las probabilidades ordenadas (llamaremos a esta simulación en específico secuencial) dándonos como resultado:
+
+```{r}
+media <- data.frame(media_t,media_s,media_aprox)
+names(media)<- c("Teorica","Sample","Secuencial")
+media
+```
+
+Ahora realicemos la comparación gráfica de la simulación con la representación teórica:
 
 ```{r}
 res <- table(hx)/nsim
 plot(res, ylab = "frecuencia relativa", xlab = "valores")
 points(x,fmp,pch=4,col='blue')
 ```
+
+Para la última parte, haremos uso de una TABLA GUÍA de $k-1$ subintervalos.
+
+Para esto, el código que modela este método es
+
+```{r}
+rfmp.tabla <- function(x, prob = 1/length(x), m, nsim = 1000) {
+  Fx <- cumsum(prob)
+  g <- rep(1,m)
+  i <- 1
+  for(j in 2:m) {
+    while (Fx[i] < (j-1)/m) i <- i + 1
+    g[j] <- i
+  }
+  X <- numeric(nsim)
+  U <- runif(nsim)
+  ncomp <<- 0 
+  for(j in 1:nsim) {
+    i <- g[floor(U[j]*m) + 1]
+    ncomp <<- ncomp - i + 1 
+    while (Fx[i] < U[j]) i <- i + 1
+    ncomp <<- ncomp + i
+    X[j] <- x[i]
+  }
+  return(X)
+}
+```
+
+Desarrollamos el algoritmo
+
+```{r}
+ncomp <- 0
+tiempotabla <- system.time(
+rx <- rfmp.tabla(x, fmp, k-1, nsim)
+)
+mediatabla <- mean(rx)
+NcompTabla <- ncomp/nsim
+```
+
+El número de comparaciones, el tiempo de cómputo y la media de la tabla se muestran en ese orden:
+
+```{r echo=FALSE}
+NcompTabla
+tiempotabla
+mediatabla
+```
+
+Analizando los resultados y graficandolos para compararlos con la media teórica tenemos
+```{r}
+res <- as.data.frame(table(rx)/nsim)
+names(res) <- c("x", "psim")
+
+plot(as.matrix(res), type="h")
+points(x, fmp, pch=4)
+```
+
 
   ***c) Diseñar una rutina que permita generar $nsim$ valores de una distribución discreta usando el método de Alias. Repetir los pasos de los apartados anteriores empleando esta rutina comparar los resultados obtenidos.***
   
@@ -339,17 +432,46 @@ rfmp.alias <- function(x,prob=1/length(x),nsim=1000){
 }
 ```
 
-Tiempo de ejecución empleando Alias
+
+
+
+Obtenemos el tiempo de cómputo, la media y el número de comparaciones del método
 
 ```{r}
-system.time(hx <- rfmp.alias(x,fmp,nsim))
+ncomp <- 0
+tiempoalias <- system.time( rx <- rfmp.alias(x,fmp,nsim) )
+mediaalias <- mean(rx)
+NcompAlias <- ncomp/nsim
 ```
 
-Análisis de los resultados:
+```{r echo=FALSE}
+tiempoalias
+mediaalias
+NcompAlias
+```
+
 
 ```{r}
-res <- table(hx)/nsim
-plot(res,ylab="frecuencia relativa", xlab = "valores")
-points(x,fmp,pch=4,col='blue')
+# Análisis resultados
+res <- as.data.frame(table(rx)/nsim)
+names(res) <- c("x", "psim")
+
+# Comparación teórica
+plot(as.matrix(res), type="h")
+points(x, fmp, pch=4)
+
 ```
 
+Finalmente veamos una comparación de tiempo de CPU,las medias y el número de comparaciones obtenidas. 
+
+```{r}
+p <- as.data.frame(cbind(as.numeric(tiempoalias[3]),as.numeric(tiempotabla[3]),as.numeric(tiempo_aprox[3]),as.numeric(tiempo_cuantil[3]),as.numeric(tiempo_s[3])))
+z <- matrix( c(p,mediaalias,mediatabla,media_aprox,media_cuantil,media_s,NcompAlias,NcompTabla, Ncomp_aprox,Ncomp_cuantil, Ncomp_s), ncol = 3,nrow =5)
+colnames(z) <- c('Tiempo','Media','No Comparaciones')
+rownames(z) <- c('Alias','Tabla Guía','TG Secuencial','Cuantil','Sample')
+z
+media_t
+
+```
+
+Notamos a simple vista que el método más efectivo en tiempo de ejecución resulta ser aquel en el que usamos la función $sample$ aunque para la aproximación de la media no es muy bueno como el método del Cuantil. Despues tenemos que el método del Alias resulta un poco convicente tanto por el tiempo de ejecución, como por la aproximación a la media teórica.

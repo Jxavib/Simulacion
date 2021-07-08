@@ -12,3 +12,63 @@ output: html_document
 $$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
 
 *** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
+
+Consideremos como densidad auxiliar la uniforme en $[-1,1]\times[-1,1]:$
+
+$$g(x,y)=\left\{\begin{array}{l c} \frac{1}{4} & \text{ si } \quad x\in[-1,1]\text{ e }y\in[-1,1] \\ \\ 0 & \text{ en otro caso} \end{array}\right.$$
+
+Como $f(x,y)\leq M=f(0,0)=\frac{3}{8}$, tomando $c=\frac{M}{g(x,y)}=\frac{3}{2}$ tendríamos que $f(x,y)\leq cg(x,y)=M$ y el algoritmo sería:
+
+1. Generar $U \sim \mathcal{U}(0,1)$.
+2. Generar $T_1,\,T_2\sim \mathcal{U}[-1,1]
+3. Si $M\cdot U\leq f(T_1,T_2)$ devolver $X=(T_1,T_2)$
+4. Encaso contrario volver al paso 1.
+
+```{r}
+#Implementación del algoritmo previo
+set.seed(54321)
+nsim=100
+
+# funcion f
+a=3/16
+f <- function(x,y)
+{
+  if(-1<=x && x<=1 && -1<=y && y<=1 )
+  { 
+    sol=a*(2-(x^2+y^2))
+    return(sol)
+  }
+  else
+    return(0)
+}
+
+acep.rech <- function(nsim)
+{
+M=3/8
+
+# primera prueba si pasa no se ejecuta el bucle
+U <- runif(1)
+T1 <- runif(nsim,-1,1)
+T2 <- runif(nsim,-1,1)
+
+while(M*U>f(T1,T2))
+{
+U <- runif(nsim)
+T1 <- runif(nsim,-1,1)
+T2 <- runif(nsim,-1,1)
+}
+X=cbind(T1,T2)
+return(X)
+}
+
+# X
+# plot(f(T1,T2))
+# hist(f(T1,T2) )
+
+```
+
+
+```{r}
+system.time(x <- acep.rech(nsim))
+```
+

@@ -7,10 +7,87 @@ output: html_document
 
 # Taller simulación de distribuciones multidimensionales
 
+<<<<<<< HEAD
 *** 1. (Ejercicio 1-Ricardo Cao) La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por***
+=======
+***1. La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por $$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$ Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
 
-$$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
+Consideremos como densidad auxiliar la uniforme en $[-1,1]\times[-1,1]:$
 
+$$g(x,y)=\left\{\begin{array}{l c} \frac{1}{4} & \text{ si } \quad x\in[-1,1]\text{ e }y\in[-1,1] \\ \\ 0 & \text{ en otro caso} \end{array}\right.$$
+
+Como $f(x,y)\leq M=f(0,0)=\frac{3}{8}$, tomando $c=\frac{M}{g(x,y)}=\frac{3}{2}$ tendríamos que $f(x,y)\leq cg(x,y)=M$ y el algoritmo sería:
+
+1. Generar $U \sim \mathcal{U}(0,1)$.
+2. Generar $T_1,\,T_2\sim \mathcal{U}[-1,1]
+3. Si $M\cdot U\leq f(T_1,T_2)$ devolver $X=(T_1,T_2)$
+4. Encaso contrario volver al paso 1.
+
+```{r}
+#Implementación del algoritmo previo
+set.seed(54321)
+nsim <- 10^4
+# funcion f
+a=3/16
+f <- function(x,y)
+{
+  ifelse((-1<=x & x<=1) & (-1<=y & y<=1),a*(2-(x^2+y^2)),0)
+}
+
+acep.rech <- function()
+{
+M=3/8
+while(T)
+{
+U <- runif(1)
+T1 <- runif(1,-1,1)
+T2 <- runif(1,-1,1)
+
+if(M*U<=f(T1,T2)) 
+  return(c(T1,T2))
+}
+}
+nacep.rech <- function(n=10^4) #ejecuta n veces la instrucción acep.rech()
+{
+  z <- matrix(nrow =n, ncol=2)
+  for(i in 1:n)
+  {
+    z[i,] <- acep.rech()
+  }
+  return(z)
+}
+
+```
+
+
+```{r}
+z <- nacep.rech(nsim)
+head(z)
+```
+
+```{r}
+hist(z[,1],breaks="FD")
+```
+
+```{r}
+hist(z[,2],breaks="FD")
+```
+```{r}
+v <- 1:nsim
+for(i in 1:nsim){
+  v[i] <- f(z[i,1],z[i,2])
+}
+library(plot3D)
+scatter3D(z[,1],z[,2],v)
+```
+
+```{r}
+print(c(mean(z[,1]),mean(z[,2])))
+```
+>>>>>>> f7b84ee03d0c99ace5d506eb788c8dcae8c19f4e
+
+
+<<<<<<< HEAD
 *** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
 
 
@@ -36,3 +113,5 @@ Consideramos entonces la función de densidad dada en el ejemplo 7.2 que justame
 
 
 $$
+=======
+>>>>>>> f7b84ee03d0c99ace5d506eb788c8dcae8c19f4e

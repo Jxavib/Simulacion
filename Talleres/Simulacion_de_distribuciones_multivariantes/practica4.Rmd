@@ -7,11 +7,7 @@ output: html_document
 
 # Taller simulación de distribuciones multidimensionales
 
-*** 1. La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por***
-
-$$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
-
-*** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
+***1. La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por $$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$ Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
 
 Consideremos como densidad auxiliar la uniforme en $[-1,1]\times[-1,1]:$
 
@@ -27,48 +23,63 @@ Como $f(x,y)\leq M=f(0,0)=\frac{3}{8}$, tomando $c=\frac{M}{g(x,y)}=\frac{3}{2}$
 ```{r}
 #Implementación del algoritmo previo
 set.seed(54321)
-nsim=100
-
+nsim <- 10^4
 # funcion f
 a=3/16
 f <- function(x,y)
 {
-  if(-1<=x && x<=1 && -1<=y && y<=1 )
-  { 
-    sol=a*(2-(x^2+y^2))
-    return(sol)
-  }
-  else
-    return(0)
+  ifelse((-1<=x & x<=1) & (-1<=y & y<=1),a*(2-(x^2+y^2)),0)
 }
 
-acep.rech <- function(nsim)
+acep.rech <- function()
 {
 M=3/8
-
-# primera prueba si pasa no se ejecuta el bucle
-U <- runif(1)
-T1 <- runif(nsim,-1,1)
-T2 <- runif(nsim,-1,1)
-
-while(M*U>f(T1,T2))
+while(T)
 {
-U <- runif(nsim)
-T1 <- runif(nsim,-1,1)
-T2 <- runif(nsim,-1,1)
-}
-X=cbind(T1,T2)
-return(X)
-}
+U <- runif(1)
+T1 <- runif(1,-1,1)
+T2 <- runif(1,-1,1)
 
-# X
-# plot(f(T1,T2))
-# hist(f(T1,T2) )
+if(M*U<=f(T1,T2)) 
+  return(c(T1,T2))
+}
+}
+nacep.rech <- function(n=10^4) #ejecuta n veces la instrucción acep.rech()
+{
+  z <- matrix(nrow =n, ncol=2)
+  for(i in 1:n)
+  {
+    z[i,] <- acep.rech()
+  }
+  return(z)
+}
 
 ```
 
 
 ```{r}
-system.time(x <- acep.rech(nsim))
+z <- nacep.rech(nsim)
+head(z)
 ```
+
+```{r}
+hist(z[,1],breaks="FD")
+```
+
+```{r}
+hist(z[,2],breaks="FD")
+```
+```{r}
+v <- 1:nsim
+for(i in 1:nsim){
+  v[i] <- f(z[i,1],z[i,2])
+}
+library(plot3D)
+scatter3D(z[,1],z[,2],v)
+```
+
+```{r}
+print(c(mean(z[,1]),mean(z[,2])))
+```
+
 

@@ -44,7 +44,7 @@ if(M*U<=f(T1,T2))
   return(c(T1,T2))
 }
 }
-nacep.rech <- function(n=10^4) #ejecuta n veces la instrucción acep.rech()
+nacep.rech <- function(n=10^4) #ejecuta n veces la instrucción acep.rech() y devuelve una matriz nx2
 {
   z <- matrix(nrow =n, ncol=2)
   for(i in 1:n)
@@ -56,18 +56,24 @@ nacep.rech <- function(n=10^4) #ejecuta n veces la instrucción acep.rech()
 
 ```
 
+Eficiencia del algoritmo
 
 ```{r}
-z <- nacep.rech(nsim)
+system.time(z <- nacep.rech(nsim))
+```
+
+```{r}
 head(z)
 ```
 
+
+
 ```{r}
-hist(z[,1],breaks="FD")
+hist(z[,1],breaks="FD",main = "Histograma de x",xlab = "x",ylab = "Frecuencia" )
 ```
 
 ```{r}
-hist(z[,2],breaks="FD")
+hist(z[,2],breaks="FD",main = "Histograma de y",xlab = "x",ylab = "Frecuencia")
 ```
 ```{r}
 v <- 1:nsim
@@ -77,6 +83,8 @@ for(i in 1:nsim){
 library(plot3D)
 scatter3D(z[,1],z[,2],v)
 ```
+
+medias $(x,y)$
 
 ```{r}
 print(c(mean(z[,1]),mean(z[,2])))

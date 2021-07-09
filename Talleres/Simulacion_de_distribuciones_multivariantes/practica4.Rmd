@@ -7,10 +7,11 @@ output: html_document
 
 # Taller simulación de distribuciones multidimensionales
 
-<<<<<<< HEAD
-*** 1. (Ejercicio 1-Ricardo Cao) La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por***
-=======
-***1. La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por $$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$ Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
+***1. (Ejercicio 1-Ricardo Cao) La diferencia en precio $(X)$ y entiempo de vida $(Y)$ de un monitor de 17 pulgadas, expresados en tanto po uno con respecto a la media de mercado, puede suponerse una variable aleatoria, $(X,Y)$, con función de densidad dada por 
+
+$$f(x,y)=\left\{\begin{array}{l c} \frac{3}{16}[2-(x^2+y^2)] & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.
+
+$$ Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
 
 Consideremos como densidad auxiliar la uniforme en $[-1,1]\times[-1,1]:$
 
@@ -84,34 +85,155 @@ scatter3D(z[,1],z[,2],v)
 ```{r}
 print(c(mean(z[,1]),mean(z[,2])))
 ```
->>>>>>> f7b84ee03d0c99ace5d506eb788c8dcae8c19f4e
 
-
-<<<<<<< HEAD
-*** Simular dicha distribución bidimensional mediante el método de aceptación-rechazo utilizando como densidad auxiliar una de muy sencilla simulación. ¿ Cuál es la eficiencia del algoritmo? Dar, muy brevemente, la idea en que consiste alguno de ellos.***
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*** 2. (Ejercicio 7.1 Blog) Considerando la variable aleatoria bidimensional del Ejemplo 7.2 y teniendo en cuenta que la densidad marginal de la variable $X$ es:***
+*** 2. (Ejercicio 7.1 Blog) Considerando la variable aleatoria bidimensional del Ejemplo 7.2 y teniendo en cuenta que la densidad marginal de la variable $X$ es: ***
 
 $$f_{X}(x)=\left\{\begin{array}{l c} \frac{1}{8}[5-3x^2] & \text{ si }\quad x\in[-1,1] \\ 0 & \text{en otro caso} \end{array} \right.$$
-*** Describir brevemente un algoritmo para la simulación del vector aleatorio basado en el método de las distribuciones condicionadas (asumir que se dispone de un algoritmo para generar observaciones de las distribuciones unidimensionales de interés). ***
 
+*** Describir brevemente un algoritmo para la simulación del vector aleatorio basado en el método de las distribuciones condicionadas (asumir que se dispone de un algoritmo para generar observaciones de las distribuciones unidimensionales de interés). ***
 
 Consideramos entonces la función de densidad dada en el ejemplo 7.2 que justamenete es la que se define en el ejercicio anterior.
 
+Como se sabe que:
 
-$$
-=======
->>>>>>> f7b84ee03d0c99ace5d506eb788c8dcae8c19f4e
+$$f(x|y)=\frac{f(x,y)}{f_{Y}(y)}$$
+Entonces se tiene también que:
+
+$$f_{y}(x|y)=\frac{f(x,y)}{f_{X}(x)}$$
+Así:
+
+$$f_{y}(y|x)=\left\{\begin{array}{l c} \frac{\frac{3}{16}[2-(x^2+y^2)]}{\frac{1}{8}[5-3x^2]} & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
+$$f_{y}(y|x)=\left\{\begin{array}{l c} (\frac{3}{2})\frac{2-(x^2+y^2)}{5-3x^2} & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
+
+Por el método de las distribuciones condicionales, se tendría que hacer:
+
+1. Generar $X ~ f_{X}(x)$
+2. Generar $Y ~ f_{Y}(y|x)$
+3. Entregar $(X,Y)$
+
+Generamos $X$ a través del método de aceptación/rechazo, pues se trata de una densidad acotada definida en un intervalo acotado.
+
+Primero, se implementa la función de densidad de $X$
+
+```{r}
+
+densidad_x <- function(x){ 
+  y <- numeric(1)
+   if(x>=-1 && x<=1){
+    y <- (1/8)*(5-3*x^2)}
+  else {y<-0
+  }
+  return(y)
+}
+#función que acota
+acot_g <- function(x){
+  if(x>=-1 && x<=1){
+    y <- 1/2
+  }
+  else
+    y<-0
+  return(y)
+}
+
+```
+
+Para ello generemos el método de aceptación y rechazo, considerando que:
+
+$$f_{X}(x)<=M=\frac{5}{8}$$ para $$x \in [-1,1]$$ y la función de densidad auxiliar:
+
+$$g(x)=\left\{\begin{array}{l c} \frac{1}{2} & \text{ si }\quad x\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
+
+```{r}
+
+rf1Distr <- function() {
+# Simulación por aceptación-rechazo
+# Funcion de distribución del ejercicio a partir de g
+  M<-5/8
+  a <- -1
+  b <- 1
+  while (TRUE) {
+    U <- runif(1)
+    V <- runif(1)
+    X <- a+(b-a)*V
+    ngen <<- ngen + 1 
+    if ((5/8)*U/densidad_x(X) <= 1) {
+      return(X)}
+    
+  }
+}
+
+
+rf1 <- function(n=100) {
+# Simulación n valores 
+    x <- numeric(n)
+    ngen <<- 0 
+    for(i in 1:n) x[i]<-rf1Distr()
+    return(x)
+}
+
+```
+
+Vemos los valores obtenido (10 primeros):
+
+```{r}
+x_obt<-rf1()
+head(x_obt,10)
+```
+Ahora para la segunda variable, como:
+
+$$f_{y}(y|x)=(\frac{3}{2})\frac{2-(x^2+y^2)}{5-3x^2}<=M=3/5$$ cuando ya está dado un valor fijo para $$x \in [-1,1]$$ e $y$ varía entre $[-1,1]$
+
+Análogamnte a lo anterior, se tendría la implementación de la función de densidad de $Y|X$:
+
+```{r}
+densidad_y<-function(y,x){
+  z<-numeric(1)
+  if(y>=1 && y<=1){
+      z<-(3/2)*((2-(x^2+y^2))/(5-3*x^2))
+      }
+  else {z<-0}
+  return(z)
+}
+```
+
+Y la del método anterior:
+
+```{r}
+
+rf2Distr <- function(p) {
+# Simulación por aceptación-rechazo
+# Funcion de distribución del ejercicio a partir de g
+  M<-3/5
+  a <- -1
+  b <- 1
+  while (TRUE) {
+    U <- runif(1)
+    V <- runif(1)
+    X <- a+(b-a)*V
+    ngen <<- ngen + 1
+    if ((3/5)*U/densidad_y(X,p) <= 1) {
+      return(X)}
+    
+  }
+}
+
+
+rf2 <- function(n=100,p) {
+# Simulación n valores 
+    x <- numeric(n)
+    ngen <<- 0 
+    for(i in 1:n) x[i]<-rf2Distr(p[i])
+    return(x)
+}
+
+```
+
+Y obtenemos los valores para $Y$
+
+```{r}
+y<-rf2(n=100,x_obt)
+```
+
+
+
+

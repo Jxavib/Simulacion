@@ -16,7 +16,7 @@ $$g(x,y)=\left\{\begin{array}{l c} \frac{1}{4} & \text{ si } \quad x\in[-1,1]\te
 Como $f(x,y)\leq M=f(0,0)=\frac{3}{8}$, tomando $c=\frac{M}{g(x,y)}=\frac{3}{2}$ tendríamos que $f(x,y)\leq cg(x,y)=M$ y el algoritmo sería:
 
 1. Generar $U \sim \mathcal{U}(0,1)$.
-2. Generar $T_1,\,T_2\sim \mathcal{U}[-1,1]
+2. Generar $T_1,\,T_2\sim \mathcal{U}[-1,1]$
 3. Si $M\cdot U\leq f(T_1,T_2)$ devolver $X=(T_1,T_2)$
 4. Encaso contrario volver al paso 1.
 
@@ -92,10 +92,10 @@ print(c(mean(z[,1]),mean(z[,2])))
 
 
 
-*** 2. (Ejercicio 7.1 Blog) Considerando la variable aleatoria bidimensional del Ejemplo 7.2 y teniendo en cuenta que la densidad marginal de la variable $X$ es:***
+***2. (Ejercicio 7.1 Blog) Considerando la variable aleatoria bidimensional del Ejemplo 7.2 y teniendo en cuenta que la densidad marginal de la variable $X$ es:***
 
 $$f_{X}(x)=\left\{\begin{array}{l c} \frac{1}{8}[5-3x^2] & \text{ si }\quad x\in[-1,1] \\ 0 & \text{en otro caso} \end{array} \right.$$
-*** Describir brevemente un algoritmo para la simulación del vector aleatorio basado en el método de las distribuciones condicionadas (asumir que se dispone de un algoritmo para generar observaciones de las distribuciones unidimensionales de interés). ***
+***Describir brevemente un algoritmo para la simulación del vector aleatorio basado en el método de las distribuciones condicionadas (asumir que se dispone de un algoritmo para generar observaciones de las distribuciones unidimensionales de interés).***
 
 
 Consideramos entonces la función de densidad dada en el ejemplo 7.2 que justamenete es la que se define en el ejercicio anterior.

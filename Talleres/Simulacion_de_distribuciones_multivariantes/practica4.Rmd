@@ -102,8 +102,8 @@ $$f_{y}(y|x)=\left\{\begin{array}{l c} (\frac{3}{2})\frac{2-(x^2+y^2)}{5-3x^2} &
 
 Por el método de las distribuciones condicionales, se tendría que hacer:
 
-1. Generar $X ~ f_{X}(x)$
-2. Generar $Y ~ f_{Y}(y|x)$
+1. Generar $X \sim f_{X}(x)$
+2. Generar $Y \sim f_{Y}(y|x)$
 3. Entregar $(X,Y)$
 
 Generamos $X$ a través del método de aceptación/rechazo, pues se trata de una densidad acotada definida en un intervalo acotado.
@@ -111,23 +111,13 @@ Generamos $X$ a través del método de aceptación/rechazo, pues se trata de una
 Primero, se implementa la función de densidad de $X$
 
 ```{r}
-
+#funcion de densidad f
 densidad_x <- function(x){ 
-  y <- numeric(1)
-   if(x>=-1 && x<=1){
-    y <- (1/8)*(5-3*x^2)}
-  else {y<-0
-  }
-  return(y)
+  ifelse((-1<= x & x<=1),0.125*(5-3*x^2),0)
 }
 #función que acota
 acot_g <- function(x){
-  if(x>=-1 && x<=1){
-    y <- 1/2
-  }
-  else
-    y<-0
-  return(y)
+  ifelse((-1<=x & x<=1),0.5,0)
 }
 
 ```
@@ -141,7 +131,7 @@ $$g(x)=\left\{\begin{array}{l c} \frac{1}{2} & \text{ si }\quad x\in[-1,1] \\ \\
 ```{r}
 
 rf1Distr <- function() {
-# Simulación por aceptación-rechazo
+# Simulación por aceptación-rechazo de una variable
 # Funcion de distribución del ejercicio a partir de g
   M<-5/8
   a <- -1
@@ -151,7 +141,7 @@ rf1Distr <- function() {
     V <- runif(1)
     X <- a+(b-a)*V
     ngen <<- ngen + 1 
-    if ((5/8)*U/densidad_x(X) <= 1) {
+    if (M*U/densidad_x(X) <= 1) {
       return(X)}
     
   }
@@ -181,13 +171,9 @@ $$f_{y}(y|x)=(\frac{3}{2})\frac{2-(x^2+y^2)}{5-3x^2}<=M=3/5$$ cuando ya está da
 Análogamnte a lo anterior, se tendría la implementación de la función de densidad de $Y|X$:
 
 ```{r}
+# se crea la función de densidad Y|X
 densidad_y<-function(y,x){
-  z<-numeric(1)
-  if(y>=1 && y<=1){
-      z<-(3/2)*((2-(x^2+y^2))/(5-3*x^2))
-      }
-  else {z<-0}
-  return(z)
+  ifelse((-1<=y & y<=1),1.5*((2-(x^2+y^2))/(5-3*x^2)),0)
 }
 ```
 
@@ -206,7 +192,7 @@ rf2Distr <- function(p) {
     V <- runif(1)
     X <- a+(b-a)*V
     ngen <<- ngen + 1
-    if ((3/5)*U/densidad_y(X,p) <= 1) {
+    if (M*U/densidad_y(X,p) <= 1) {
       return(X)}
     
   }
@@ -225,6 +211,7 @@ rf2 <- function(n=100,p) {
 
 Y obtenemos los valores para $Y$
 
-```{r eval=F}
+```{r}
 y<-rf2(n=100,x_obt)
+head(y)
 ```

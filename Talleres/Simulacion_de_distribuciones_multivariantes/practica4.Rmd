@@ -100,7 +100,7 @@ $$f_{y}(x|y)=\frac{f(x,y)}{f_{X}(x)}$$
 Así:
 
 $$f_{y}(y|x)=\left\{\begin{array}{l c} \frac{\frac{3}{16}[2-(x^2+y^2)]}{\frac{1}{8}[5-3x^2]} & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
-$$f_{y}(y|x)=\left\{\begin{array}{l c} (\frac{3}{2})\frac{2-(x^2+y^2)}{5-3x^2} & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
+$$f_{y}(y|x)=\left\{\begin{array}{l c} \left(\frac{3}{2}\right)\frac{2-(x^2+y^2)}{5-3x^2} & \text{ si }\quad x\in[-1,1]\text{ e } y\in[-1,1] \\ \\ 0 & \text{en otro caso} \end{array} \right.$$
 
 Por el método de las distribuciones condicionales, se tendría que hacer:
 
@@ -224,4 +224,12 @@ Si juntamos los valores obtenidos $$(X,Y)$$: Los 20 primeros valores obtenidos s
 head(cbind(x_obt,y),20)
 ```
  
+```{r}
+w <- 1:nsim
+for(i in 1:nsim){
+  w[i] <- f(x_obt[i],y[i])
+}
+library(plot3D)
+scatter3D(x_obt,y,w)
+```
 

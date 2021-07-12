@@ -1,6 +1,6 @@
 ---
 title: "Practica 4"
-author: "Beltran Henry, Burbano Joel,Guaman Ronny"
+author: "Beltran Henry, Burbano Joel,Guamán Ronny"
 date: "6/7/2021"
 output: 
   html_document: 
@@ -117,10 +117,6 @@ Primero, se implementa la función de densidad de $X$
 densidad_x <- function(x){ 
   ifelse((-1<= x & x<=1),0.125*(5-3*x^2),0)
 }
-#función que acota
-acot_g <- function(x){
-  ifelse((-1<=x & x<=1),0.5,0)
-}
 
 ```
 
@@ -215,10 +211,17 @@ Y obtenemos los valores para $Y$
 
 ```{r}
 y<-rf2(nsim,x_obt)
-head(y)
+head(y,10)
 ```
 
 ```{r}
 hist(y,breaks = "FD",main = "Histograma de y",xlab = "y",ylab = "Frecuencia")
 ```
+
+Si juntamos los valores obtenidos $$(X,Y)$$: Los 20 primeros valores obtenidos son:
+
+```{r}
+head(cbind(x_obt,y),20)
+```
+ 
 

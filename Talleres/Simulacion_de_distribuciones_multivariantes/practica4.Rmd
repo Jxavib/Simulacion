@@ -183,7 +183,7 @@ Y la del método anterior:
 
 ```{r}
 
-rf2Distr <- function(p) {
+rf2Distr <- function(p){
 # Simulación por aceptación-rechazo
 # Funcion de distribución del ejercicio a partir de g
   M<-3/5

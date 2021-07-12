@@ -566,7 +566,7 @@ pre code {
 <span id="cb13-3"><a href="#cb13-3"></a>  <span class="kw">ifelse</span>((<span class="op">-</span><span class="dv">1</span><span class="op">&lt;=</span>y <span class="op">&amp;</span><span class="st"> </span>y<span class="op">&lt;=</span><span class="dv">1</span>),<span class="fl">1.5</span><span class="op">*</span>((<span class="dv">2</span><span class="op">-</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>))<span class="op">/</span>(<span class="dv">5-3</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span>)),<span class="dv">0</span>)</span>
 <span id="cb13-4"><a href="#cb13-4"></a>}</span></code></pre></div>
 <p>Y la del método anterior:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>rf2Distr &lt;-<span class="st"> </span><span class="cf">function</span>(p) {</span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>rf2Distr &lt;-<span class="st"> </span><span class="cf">function</span>(p){</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co"># Simulación por aceptación-rechazo</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co"># Funcion de distribución del ejercicio a partir de g</span></span>
 <span id="cb14-4"><a href="#cb14-4"></a>  M&lt;-<span class="dv">3</span><span class="op">/</span><span class="dv">5</span></span>

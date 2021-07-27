@@ -13,14 +13,43 @@ a) ***Emplear integración Monte-Carlo clásica (distribución uniforme) y repre
 
 ```{r}
 # Desarrollo del literal a)
+#Implementacion  monte carlo
+mc.integral0 <- function(fun,a,b,n){
+  x <- runif(n,a,b)
+  fx <- sapply(x,fun)
+  return(mean(fx)*(b-a))
+}
 
+#Funcion a integrar
 
+fun <- function(x) ifelse((-1<x &x<1),0.125*(5-3*x^2),0)
+
+# Representación grafica
+
+curve(fun,-1,1)
+abline(h=0,lty=2)
+abline(v=c(-1,1),lty=2)
+
+#Realizar la intengracion en dependencia de n
+mc.integraln <- function(n=1000){
+  x <- numeric()
+  for( i in 1:n ){
+    set.seed(1)
+    x[i] <- mc.integral0(fun,-1,1,i)
+  }
+  return(x)
+}
+n=1000
+y <- mc.integraln(n)
+y <- cbind(1:n,y)
+head(y,20)
 ```
 
 b) ***Compara los resultados del apartado anterior con los obtenidos empleando muestreo de importancia con distribución auxiliar $N(0,0.3)$, ¿Se produce una reducción de la varianza?***
 
 ```{r}
 #Desarrollo del literal b)
+
 
 ```
 

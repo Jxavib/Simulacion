@@ -22,31 +22,49 @@ mc.integral <- function(fun, a, b, n) {
     return(mean(fx) * (b - a))
 }
 
+
+
+#Aunque posteriormente usaremos una función de Monte Carlo más compleja que incluye representación gráfica.
+
+
+mc.integral <- function(fun, a, b, n, plot = TRUE) {
+    fx <- sapply(runif(n, a, b), fun) * (b - a)
+    if (plot) {
+        estint <- cumsum(fx)/(1:n)
+        esterr <- sqrt(cumsum((fx - estint)^2))/(1:n)
+        plot(estint, ylab = "Media y rango de error", type = "l", lwd = 2, ylim = mean(fx) + 
+            2 * c(-esterr[1], esterr[1]), xlab = "Iteraciones")
+        lines(estint + 2 * esterr, col = "darkgray", lwd = 2)
+        lines(estint - 2 * esterr, col = "darkgray", lwd = 2)
+        return(list(valor = estint[n], error = 2 * esterr[n]))
+    } else return(list(valor = mean(fx), error = 2 * sd(fx)/sqrt(n)))
+}
 ```
+
 
 Escribrimos el código de la función objetivo y vamos a ver la aproximación por Montecarlo con un $n=20$ y $n=100$
 
-**Con $n=20$**
+**Con $n=20$, la aproximación es:**
 
 ```{r}
 fun <- function(x) return((1/8) * (5-3*x^2))
 set.seed(1718)
-p1 <- mc.integral(fun, -1, 1, 20)
-p1
+p1 <- mc.integral(fun, -1, 1, 20,plot = F)
+p1$valor
 ```
 
-**con $n=100$**
+**con $n=100$ la aproximaximación es:**
 
 ```{r}
-p1 <- mc.integral(fun, -1, 1, 100)
-p1
+p2 <- mc.integral(fun, -1, 1, 100,plot=F)
+p2$valor
 ```
 
 En esta ocasión tenemos conocimiento del valor real de la integral, que es 1, así que comparándolo con el error real y el error obtenido mediante la función tenemos:
 ```{r echo=FALSE}
 error_función <- c(p1$error , p2$error)
 error_por_aproximación <- c(abs(1-p1$valor), abs(1-p2$valor))
-p <- cbind(error_función,error_por_aproximación)
+p <- cbind(error_función, error_por_aproximación)
 row.names(p) <- c('n=20','n=100')
 p
 ```
@@ -54,6 +72,8 @@ p
 Notemos que el error dado por la función es MAYOR al error "real" obtenido mediante la integral exacta. 
 
 Ahora, realizamos una representación gráfica de la aproximación junto con los valores aproximados con $n=1000$
+
+
 ```{r echo=FALSE}
 set.seed(1718)
 c <- mc.integral(fun, -1, 1, 1000)
@@ -75,7 +95,10 @@ Que al igual que en las otras $n$ simulaciones, se tiene que el error por funci�
 b) ***Compara los resultados del apartado anterior con los obtenidos empleando muestreo de importancia con distribución auxiliar $N(0,0.3)$, ¿Se produce una reducción de la varianza?***
 
 ```{r}
-#Desarrollo del literal b)
+set.seed(1718)
+nsim <- 10^3
+y <- rnorm(nsim,mean=0,sd=0.3)
+w <- fun(y)/dnorm(y , sd=0.3)
 
 ```
 

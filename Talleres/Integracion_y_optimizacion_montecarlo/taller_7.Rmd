@@ -1,0 +1,33 @@
+---
+title: "Taller MonteCarlo"
+author: "Beltran Henry, Burbano Joel,Guaman Ronny"
+date: "27/7/2021"
+output: html_document
+---
+
+# Ejercicios de fin de práctica
+
+***6. Aproximar mediante simulación la integral: $$\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$***
+
+a) ***Emplear integración Monte-Carlo clásica (distribución uniforme) y representar graficamente la aproximación en función de $n(1\leq n\leq 1000)$.***
+
+```{r}
+# Desarrollo del literal a)
+
+
+```
+
+b) ***Compara los resultados del apartado anterior con los obtenidos empleando muestreo de importancia con distribución auxiliar $N(0,0.3)$, ¿Se produce una reducción de la varianza?***
+
+```{r}
+#Desarrollo del literal b)
+
+```
+
+c) ***Generar 100 simulaciones de la distribución (aprox) con densidad $f(x)=\frac{1}{8}(5-3x^2)$ si $-1<x<1$ mediante remuestreo del muestro por importancia de 1000 valores de una $N(0,0.3)$***
+
+```{r}
+#Desarrolllo del literal c)
+
+```
+

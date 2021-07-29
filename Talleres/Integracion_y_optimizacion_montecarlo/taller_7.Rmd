@@ -1,6 +1,6 @@
 ---
 title: "Taller MonteCarlo"
-author: "Beltran Henry, Burbano Joel,Guaman Ronny"
+author: "Beltran Henry, Burbano Joel,Guamán Ronny"
 date: "27/7/2021"
 output: html_document
 ---
@@ -101,6 +101,56 @@ y <- rnorm(nsim,mean=0,sd=0.3)
 w <- fun(y)/dnorm(y , sd=0.3)
 
 ```
+
+
+Veamos la media obtenida en el intervalo $[-1,1]$
+
+```{r}
+mean(w * (y > -1) * (y < 1)) 
+```
+
+```{r include=T}
+#Esto es para obtener los datos del literal anterior.
+mc.integral1 <- function(fun, a, b, n, plot = TRUE) {
+    fx <- sapply(runif(n, a, b), fun) * (b - a)
+    if (plot) {
+        estint <- cumsum(fx)/(1:n)
+        esterr <- sqrt(cumsum((fx - estint)^2))/(1:n)
+        plot(estint, ylab = "Media y rango de error", type = "l", lwd = 2, ylim = mean(fx) + 
+            2 * c(-esterr[1], esterr[1]), xlab = "Iteraciones")
+        lines(estint + 2 * esterr, col = "darkgray", lwd = 2)
+        lines(estint - 2 * esterr, col = "darkgray", lwd = 2)
+        return(estint)
+    } else return(estint)
+}
+g <- mc.integral1(fun, -1, 1, 1000)
+```
+
+
+Comparemos ahora los datos obtenidos con este método y el literal anterior:
+
+Podemos distiguir a la línea azul (los datos generados con el literal anterior) y con rojo los datos generados empleando muestreo de importancia.
+
+```{r}
+
+plot(cumsum(w * (y > -1) * (y < 1))/1:nsim, type = "l", ylab = "Aproximación", xlab = "Iteraciones", col='red')
+abline(h = 1, lty = 2)
+lines(g,type = "l", ylab = "Aproximación", xlab = "Iteraciones",col='cadetblue')
+ 
+
+mean(w)
+```
+
+Si vemos el siguiente cáculo
+
+``` {r}
+
+sqrt(var(w)/nsim)
+sqrt(var(g)/nsim)
+
+```
+Se puede afirma que la varianza no se ha reducido con este método con respecto al del literal anterior.
+
 
 c) ***Generar 100 simulaciones de la distribución (aprox) con densidad $f(x)=\frac{1}{8}(5-3x^2)$ si $-1<x<1$ mediante remuestreo del muestro por importancia de 1000 valores de una $N(0,0.3)$***
 

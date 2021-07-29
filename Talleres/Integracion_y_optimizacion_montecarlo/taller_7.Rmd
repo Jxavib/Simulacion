@@ -11,39 +11,66 @@ output: html_document
 
 a) ***Emplear integración Monte-Carlo clásica (distribución uniforme) y representar graficamente la aproximación en función de $n(1\leq n\leq 1000)$.***
 
+Primero se describe el código de la función de Monte Carlo básica.
+
+
 ```{r}
-# Desarrollo del literal a)
-#Implementacion  monte carlo
-mc.integral0 <- function(fun,a,b,n){
-  x <- runif(n,a,b)
-  fx <- sapply(x,fun)
-  return(mean(fx)*(b-a))
+
+mc.integral <- function(fun, a, b, n) {
+    x <- runif(n, a, b)
+    fx <- sapply(x, fun)
+    return(mean(fx) * (b - a))
 }
 
-#Funcion a integrar
-
-fun <- function(x) ifelse((-1<x &x<1),0.125*(5-3*x^2),0)
-
-# Representación grafica
-
-curve(fun,-1,1)
-abline(h=0,lty=2)
-abline(v=c(-1,1),lty=2)
-
-#Realizar la intengracion en dependencia de n
-mc.integraln <- function(n=1000){
-  x <- numeric()
-  for( i in 1:n ){
-    set.seed(1)
-    x[i] <- mc.integral0(fun,-1,1,i)
-  }
-  return(x)
-}
-n=1000
-y <- mc.integraln(n)
-y <- cbind(1:n,y)
-head(y,20)
 ```
+
+Escribrimos el código de la función objetivo y vamos a ver la aproximación por Montecarlo con un $n=20$ y $n=100$
+
+**Con $n=20$**
+
+```{r}
+fun <- function(x) return((1/8) * (5-3*x^2))
+set.seed(1718)
+p1 <- mc.integral(fun, -1, 1, 20)
+p1
+```
+
+**con $n=100$**
+
+```{r}
+p1 <- mc.integral(fun, -1, 1, 100)
+p1
+```
+
+En esta ocasión tenemos conocimiento del valor real de la integral, que es 1, así que comparándolo con el error real y el error obtenido mediante la función tenemos:
+```{r echo=FALSE}
+error_función <- c(p1$error,p2$error)
+error_por_aproximación <- c(abs(1-p1$valor), abs(1-p2$valor))
+p <- cbind(error_función,error_por_aproximación)
+row.names(p) <- c('n=20','n=100')
+p
+```
+
+Notemos que el error dado por la función es MAYOR al error "real" obtenido mediante la integral exacta. 
+
+Ahora, realizamos una representación gráfica de la aproximación junto con los valores aproximados con $n=1000$
+```{r echo=FALSE}
+set.seed(1718)
+c <- mc.integral(fun, -1, 1, 1000)
+abline(h = 1, lty = 2)
+```
+
+
+Y comparando también el error obtenido por la función con el error real tenemos:
+```{r echo=T}
+error_función <- c$error
+error_por_aproximación <- abs(1-c$valor)
+p <- cbind(error_función,error_por_aproximación)
+row.names(p) <- c('n=1000')
+p
+```
+
+Que al igual que en las otras $n$ simulaciones, se tiene que el error por función es mayor al valor real.
 
 b) ***Compara los resultados del apartado anterior con los obtenidos empleando muestreo de importancia con distribución auxiliar $N(0,0.3)$, ¿Se produce una reducción de la varianza?***
 

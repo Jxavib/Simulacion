@@ -157,6 +157,6 @@ c) ***Generar 100 simulaciones de la distribución (aprox) con densidad $f(x)=\f
 
 ```{r}
 #Desarrolllo del literal c)
-
+ 
 ```
 

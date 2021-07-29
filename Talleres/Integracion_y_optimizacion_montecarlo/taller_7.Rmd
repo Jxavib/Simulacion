@@ -62,7 +62,7 @@ p2$valor
 
 En esta ocasión tenemos conocimiento del valor real de la integral, que es 1, así que comparándolo con el error real y el error obtenido mediante la función tenemos:
 ```{r echo=FALSE}
-error_función <- c(p1$error , p2$error)
+error_función <- c(p1$error,p2$error)
 error_por_aproximación <- c(abs(1-p1$valor), abs(1-p2$valor))
 p <- cbind(error_función, error_por_aproximación)
 row.names(p) <- c('n=20','n=100')
@@ -99,6 +99,7 @@ set.seed(1718)
 nsim <- 10^3
 y <- rnorm(nsim,mean=0,sd=0.3)
 w <- fun(y)/dnorm(y , sd=0.3)
+
 
 ```
 

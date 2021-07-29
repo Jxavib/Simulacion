@@ -158,5 +158,16 @@ c) ***Generar 100 simulaciones de la distribución (aprox) con densidad $f(x)=\f
 ```{r}
 #Desarrolllo del literal c)
  
+ nsim <- 10^3
+# numero de simulaciones de la densidad auxiliar
+nsim2 <- 10^7
+set.seed(1750)
+y <- rnorm(nsim2,0,0.3)
+w <- fun(y)/dnorm(y,0,0.3)
+
+rx <- sample(y,nsim,prob = w/sum(w))
+hist(rx,freq=F, breaks = "FD",ylim = c(0,1))
+lines(density(rx))
+curve(fun,col='blue',add=T)
 ```
 

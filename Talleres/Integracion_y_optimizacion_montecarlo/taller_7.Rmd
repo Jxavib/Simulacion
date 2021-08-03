@@ -158,9 +158,9 @@ c) ***Generar 100 simulaciones de la distribución (aprox) con densidad $f(x)=\f
 ```{r}
 #Desarrolllo del literal c)
  
- nsim <- 10^3
+ nsim <- 10^2
 # numero de simulaciones de la densidad auxiliar
-nsim2 <- 10^7
+nsim2 <- 10^3
 set.seed(1750)
 y <- rnorm(nsim2,0,0.3)
 w <- fun(y)/dnorm(y,0,0.3)

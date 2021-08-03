@@ -1,0 +1,20 @@
+---
+title: "Reducción de la Varianza"
+author: "Beltran Henry, Burbano Joel,Guaman Ronny"
+date: "3/8/2021"
+output: 
+  html_document: 
+    highlight: zenburn
+    theme: cerulean
+---
+
+# Ejericio de Fin de Practica
+
+5. ***Aproximar  mediante integración Monte Carlo (clásica) la media de una distribucon exponencial de parámetro $1/2$: $$I=\int_0^{\infty}\frac{x}{2}e^{-\frac{x}{2}}dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?*** NOTA: Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
+
+```{r}
+# Desarrollo e implementación en r 
+
+
+```
+

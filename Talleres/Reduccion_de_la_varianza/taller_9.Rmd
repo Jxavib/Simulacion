@@ -10,11 +10,34 @@ output:
 
 # Ejericio de Fin de Practica
 
-5. ***Aproximar  mediante integración Monte Carlo (clásica) la media de una distribucon exponencial de parámetro $1/2$: $$I=\int_0^{\infty}\frac{x}{2}e^{-\frac{x}{2}}dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?*** NOTA: Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
+5. ***Aproximar  mediante integración Monte Carlo (clásica) la media de una distribucon exponencial de parámetro $1/2$: $$I=\int_0^{\infty}\frac{x}{2}e^{-\frac{x}{2}}dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***  <span style="color:red">NOTA:</span>. Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
 
 ```{r}
 # Desarrollo e implementación en r 
 
+# MC Clásico
+nsim <- 1000
+lambda <- 0.5
+set.seed(1)
+u <- runif(nsim%/%2)
+x <- - log(u) / lambda
+
+mean(x) # Aprox por MC  # valor teor 1/lambda = 2
+vx<-var(x)  # medida precisión
+
+xa <- - log(1-u) / lambda
+mean(xa) # Aprox por MC  # valor teor 1/lambda = 2
+vxa<-var(xa)  # medida precisión
+# NOTA: Varianza suponiendo independencia
+
+corr <- cor(x,xa)
+xt <- c(x,xa)
+mean(xt) # Aprox por MC  # valor teor 1/lambda = 2
+vxt <- var(xa)*(1 + corr) # Estimación varianza suponiendo dependencia
+
+# Estimación del porcentaje de reducción en la varianza
+100*(var(x)-vxt )/var(x)
 
 ```
+
 

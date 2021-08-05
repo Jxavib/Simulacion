@@ -10,7 +10,227 @@ output:
 
 # Ejericio de Fin de Practica
 
-5. ***Aproximar  mediante integración Monte Carlo (clásica) la media de una distribucon exponencial de parámetro $1/2$: $$I=\int_0^{\infty}\frac{x}{2}e^{-\frac{x}{2}}dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***  <span style="color:red">NOTA:</span>. Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
+***5. Aproximar  mediante integración Monte Carlo (clásica) el valor de la siguiente integral:
+
+$$I=\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$ 
+*** y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?
+
+Del taller anterior, sabemos que el valor exacto de la integración es 1. Ahora, exponemos primero la función que utilizaremos para calcular la aproximación de Monte Carlo (Clásica)
+
+```{r}
+#Haremos que esta función que nos devuelva los valores simulados, la aproximación a lo largo de n, y el error.
+mc.integral <- function(f, a, b, n, plot=TRUE) {
+  fx <- sapply(runif(n, a, b), f)*(b-a)
+  estint <- cumsum(fx)/(1:n)
+    esterr <- sqrt(cumsum((fx-estint)^2))/(1:n)
+  if (plot) {
+    plot(estint, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx)+2*c(-esterr[1],esterr[1]), xlab="Iteraciones")
+    lines(estint+2*esterr, col="gold", lwd=2)
+    lines(estint-2*esterr, col="gold", lwd=2)
+    return(list(fx,estint, error=2*esterr[n]))  
+  } else return(list(fx,estint, esterr, error=2*sd(fx)/sqrt(n))) 
+}  
+```
+
+Ahora, expondremos la función a utilizar para aproximar por el método de Monte Carlo con variables antitéticas:
+
+
+```{r}
+mc.integral_anti <- function(ftn, a, b, n, plot=TRUE) {
+ x <- runif(n%/%2, a, b)
+ x <- as.numeric(matrix(c(x,a+b-x),nrow=2,byrow=TRUE))
+ fx <- sapply(x, ftn)*(b-a)
+ estint <- cumsum(fx)/(1:n)
+ esterr <- sqrt(cumsum((fx-estint)^2))/(1:n)
+  if (plot) {
+     lines(estint,lwd= 2,col="green")
+    lines(estint+2*esterr,col="green",lwd=2)
+    lines(estint-2*esterr,col="green",lwd=2)
+    return(list(fx,estint,error=2*esterr[n]))
+  } else return(list(fx,estint,error=2*sd(fx)/sqrt(n))) 
+}
+```
+
+
+Para la aproximación por Monte Carlo (clásico) y con variables antitéticas, utilizaremos el método de inversión, por lo que nuestra nueva función objetivo, a partir de la distribución exponencial, será la siguiente:
+
+```{r}
+f<-function(x){
+  ifelse((-1<=x && x<=1),((5-8*x)/3)^(1/2),0)
+  
+}
+```
+
+Por lo tanto, los nuevos límites entre los que se evaluará a la función serán 
+
+Ahora bien, para realizar la comparación entre Monte Carlo y Monte Carlo con variables antitéticas, vamos a usar valores de n=100,500,1000
+y observaremos sus resultados.
+
+Para n=100
+
+
+```{r}
+n=100
+
+set.seed(12431)
+#Simulamos para Monte Carlo clásico
+x_mc <- mc.integral(f, 0, sqrt(39)/3,n,plot = FALSE)
+fx_mc <- x_mc[[1]]
+acum_mc <- x_mc[[2]]
+esterr_mc <- x_mc[[3]]
+error_mc <- x_mc$error
+
+#Simulamos para Monte Carlo con antitéticas
+x_mca <- mc.integral_anti(f, 0, 1, n,plot=FALSE)
+fx_mca <- x_mca[[1]]
+acum_mca <- x_mca[[2]]
+error_mca <- x_mca$error
+```
+
+Comparación de resultados
+```{r echo=FALSE}
+Aproximación <- c(mean(fx_mc),mean(fx_mca))
+Error <- c(error_mc,error_mca)
+p <- cbind(Aproximación,Error)
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+p
+
+```
+
+Gráfica:
+
+_Línea negra: Monte Carlo Clásico_
+
+_Línea azul: Monte Carlo Antitética_
+```{r}
+plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")os 
+abline(h = 2, lty = 2)
+lines(acum_mca,col='cadetblue')
+```
+
+Analizando ahora, el error cometido y la varianza tenemos:
+
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+```
+_Porcentaje de Reducción de la varianza_
+```{r}
+100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
+```
+
+
+_Para $n=500$_
+```{r}
+n=500
+#Simulamos para Monte Carlo clásico
+x_mc <- mc.integral(f, 0, 1,n,plot = FALSE)
+fx_mc <- x_mc[[1]]
+acum_mc <- x_mc[[2]]
+esterr_mc <- x_mc[[3]]
+error_mc <- x_mc$error
+
+#Simulamos para Monte Carlo con antitéticas
+x_mca <- mc.integrala(f, 0, 1, n,plot = FALSE)
+fx_mca <- x_mca[[1]]
+acum_mca <- x_mca[[2]]
+error_mca <- x_mca$error
+```
+
+Comparación de resultados
+```{r echo=FALSE}
+Aproximación <- c(mean(fx_mc),mean(fx_mca))
+Error <- c(error_mc,error_mca)
+p <- cbind(Aproximación,Error)
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+p
+
+```
+
+Gráfica:
+
+_Línea negra: Monte Carlo Clásico_
+
+_Línea azul: Monte Carlo Antitética_
+```{r}
+plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
+abline(h = 2, lty = 2)
+lines(acum_mca,col='cadetblue')
+```
+
+Analizando ahora, el error cometido y la varianza tenemos:
+
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+```
+_Porcentaje de Reducción de la varianza_
+
+```{r}
+100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
+```
+
+_Para $n=1000$_
+```{r}
+n=1000
+
+set.seed(1314)
+#Simulamos para Monte Carlo clásico
+x_mc <- mc.integral(f, 0, 1,n,plot = FALSE)
+fx_mc <- x_mc[[1]]
+acum_mc <- x_mc[[2]]
+esterr_mc <- x_mc[[3]]
+error_mc <- x_mc$error
+
+#Simulamos para Monte Carlo con antitéticas
+x_mca <- mc.integrala(f, 0, 1, n,plot = FALSE)
+fx_mca <- x_mca[[1]]
+acum_mca <- x_mca[[2]]
+error_mca <- x_mca$error
+```
+
+Comparación de resultados
+```{r echo=FALSE}
+Aproximación <- c(mean(fx_mc),mean(fx_mca))
+Error <- c(error_mc,error_mca)
+p <- cbind(Aproximación,Error)
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+p
+
+```
+
+Gráfica:
+
+_Línea negra: Monte Carlo Clásico_
+
+_Línea azul: Monte Carlo Antitética_
+```{r}
+plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
+abline(h = 2, lty = 2)
+lines(acum_mca,col='cadetblue')
+```
+
+Analizando ahora, el error cometido y la varianza tenemos:
+
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+```
+_Porcentaje de Reducción de la varianza_
+```{r}
+100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
+```
+
+
+
+
+
+
+### lo que Joel implementó
+
 
 ```{r}
 # Desarrollo e implementación en r 

@@ -12,7 +12,7 @@ output:
 
 5. ***Aproximar  mediante integración Monte Carlo (clásica) la media de una distribucon exponencial de parámetro $1/2$: $$I=\int_0^{\infty}\frac{x}{2}e^{-\frac{x}{2}}dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***  <span style="color:red">NOTA:</span>. Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Desarrollo e implementación en r 
 
 # MC Clásico
@@ -24,11 +24,13 @@ x <- - log(u) / lambda
 
 mean(x) # Aprox por MC  # valor teor 1/lambda = 2
 vx<-var(x)  # medida precisión
+vx
 
 xa <- - log(1-u) / lambda
 mean(xa) # Aprox por MC  # valor teor 1/lambda = 2
 vxa<-var(xa)  # medida precisión
 # NOTA: Varianza suponiendo independencia
+vxa
 
 corr <- cor(x,xa)
 xt <- c(x,xa)
@@ -40,4 +42,47 @@ vxt <- var(xa)*(1 + corr) # Estimación varianza suponiendo dependencia
 
 ```
 
+```{r}
+#ejercicio 5
 
+# -------------------------------
+mc.integral <- function(ftn, n, plot=TRUE) {
+  # Integración Monte Carlo
+  # -------------------------------
+  fx <- sapply(runif(n%/%2), ftn)
+  m <- n%/%2
+  if (plot) {
+    estint <- cumsum(fx)/(1:m)
+    esterr <- sqrt(cumsum((fx-estint)^2))/(1:m)
+    estvar <- sum((fx-estint)^2)/(1:m)
+    plot(estint, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx)+2*c(-esterr[1],esterr[1]), xlab="Iteraciones")
+    lines(estint+2*esterr, col="gold", lwd=2)
+    lines(estint-2*esterr, col="gold", lwd=2)
+    return(list(x=fx,valor=estint[m], error=2*esterr[m],vx=estvar[m]))  
+  } else return(list(x=fx,valor=mean(fx), error=2*sd(fx)/sqrt(m),vx=var(fx)))
+}  
+lambda <- 0.5
+ftn <- function(x) return(-log(x)/lambda)
+nsim <- 10^3
+set.seed(1)
+x <- mc.integral(ftn, nsim,plot = T)
+
+fantit <- function(x) return(-log(1-x)/lambda)
+set.seed(1)
+xa <- mc.integral(fantit,nsim,plot=T)
+
+#correlacion
+corr <- cor(x$x,xa$x)
+xt <- c(x$x,xa$x)
+mean(xt)
+
+vxt <- var(xa$x)*(1+corr) #estimación varianza suponiendo dependencia
+
+#Estimación del porcentaje de reducción en la varianza
+100*(var(x$x)-vxt )/var(x$x)
+
+```
+
+# Ejercicios Extras
+
+6. ***Aproximar mediante simulación la integral: $$\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***

@@ -21,15 +21,16 @@ Del taller anterior, sabemos que el valor exacto de la integración es 1. Ahora,
 #Haremos que esta función que nos devuelva los valores simulados, la aproximación a lo largo de n, y el error.
 mc.integral <- function(f, a, b, n, plot=TRUE) {
   fx <- sapply(runif(n, a, b), f)*(b-a)
-  if (plot) {
+  #if (plot) {
     estint <- cumsum(fx)/(1:n)
     esterr <- sqrt(cumsum((fx-estint)^2))/(1:n)
+   if (plot){ 
     plot(estint, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx)+2*c(-esterr[1],esterr[1]), xlab="Iteraciones")
     abline(h=estint[n],lty=2)
     lines(estint+2*esterr, col="gold", lwd=3)
     lines(estint-2*esterr, col="gold", lwd=3)
-    return(list(x=fx,valor=estint[n], error=2*esterr[n])) 
-  } else return(list(x=fx,valor=mean(fx), error=2*sd(fx)/sqrt(n))) 
+    return(list(x=fx,estint=estint,esterr=esterr,valor=estint[n], error=2*esterr[n])) 
+  } else return(list(x=fx,estint=estint,esterr=esterr,valor=mean(fx), error=2*sd(fx)/sqrt(n))) 
 }  
 ```
 
@@ -41,14 +42,16 @@ mc.integral_anti <- function(ftn, a, b, n, plot=TRUE) {
  x <- runif(n%/%2, a, b)
  x <- as.numeric(matrix(c(x,a+b-x),nrow=2,byrow=TRUE)) # genera los valores de x y su antitetica en orden x1,ant1,x2,ant2
  fx <- sapply(x, ftn)*(b-a)
- if (plot) {
+ #if (plot) {
     estint <- cumsum(fx)/(1:n)
     esterr <- sqrt(cumsum((fx-estint)^2))/(1:n)
+  if(plot) {
     plot(estint, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx)+2*c(-esterr[1],esterr[1]), xlab="Iteraciones")
+    abline(h=estint[n],lty=2)
     lines(estint+2*esterr,col="gold",lwd=2)
     lines(estint-2*esterr,col="gold",lwd=2)
-    return(list(x=fx,valor=estint[n],error=2*esterr[n]))
-  } else return(list(x=fx,valor=mean(fx),error=2*sd(fx)/sqrt(n))) 
+    return(list(x=fx,estint=estint,esterr=esterr,valor=estint[n],error=2*esterr[n]))
+  } else return(list(x=fx,estint=estint,esterr=esterr,valor=mean(fx),error=2*sd(fx)/sqrt(n))) 
 }
 ```
 
@@ -150,8 +153,8 @@ Aproximación <- c(mean(fx_mc),mean(fx_mca))
 Error <- c(error_mc,error_mca)
 p <- cbind(Aproximación,Error)
 row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
-p
 
+kable(p,align = 'l', digits = round(4))
 ```
 
 Gráfica:
@@ -203,8 +206,8 @@ Aproximación <- c(mean(fx_mc),mean(fx_mca))
 Error <- c(error_mc,error_mca)
 p <- cbind(Aproximación,Error)
 row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
-p
 
+kable(p,align = 'l', digits = round(4))
 ```
 
 Gráfica:

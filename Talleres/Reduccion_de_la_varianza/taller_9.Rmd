@@ -10,10 +10,7 @@ output:
 
 # Ejericio de Fin de Practica
 
-***5. Aproximar  mediante integración Monte Carlo (clásica) el valor de la siguiente integral:
-
-$$I=\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$ 
-*** y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?
+***5. Aproximar  mediante integración Monte Carlo (clásica) el valor de la siguiente integral:$$I=\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$  y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***
 
 Del taller anterior, sabemos que el valor exacto de la integración es 1. Ahora, exponemos primero la función que utilizaremos para calcular la aproximación de Monte Carlo (Clásica)
 
@@ -74,7 +71,7 @@ Para n=100
 ```{r}
 n=100
 
-set.seed(1)
+set.seed(1750)
 #Simulamos para Monte Carlo clásico para la funcion original
 x_mc <- mc.integral(finv, 0,sqrt(5/3) ,n,plot = T)
 fx_mc <- x_mc[[1]]
@@ -86,7 +83,7 @@ error_mc <- x_mc$error
 
 ```{r}
 #Simulamos para Monte Carlo con antitéticas para la función original
-set.seed(12431)
+set.seed(1750)
 x_mca <- mc.integral_anti(finv,0,sqrt(13/3), n,plot=T)
 fx_mca <- x_mca[[1]]
 acum_mca <- x_mca[[2]]
@@ -108,13 +105,12 @@ kable(p,align = 'l', digits = round(4))
 
 Gráfica:
 
-_Línea negra: Monte Carlo Clásico_
 
-_Línea azul: Monte Carlo Antitética_
 ```{r}
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones") 
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
@@ -134,13 +130,15 @@ _Para $n=500$_
 ```{r}
 n=500
 #Simulamos para Monte Carlo clásico
-x_mc <- mc.integral_anti(finv, 0, 1,n,plot = FALSE)
+set.seed(1750)
+x_mc <- mc.integral(finv, 0, 1,n,plot = FALSE)
 fx_mc <- x_mc[[1]]
 acum_mc <- x_mc[[2]]
 esterr_mc <- x_mc[[3]]
 error_mc <- x_mc$error
 
 #Simulamos para Monte Carlo con antitéticas
+set.seed(1750)
 x_mca <- mc.integral_anti(finv, 0, 1, n,plot = FALSE)
 fx_mca <- x_mca[[1]]
 acum_mca <- x_mca[[2]]
@@ -159,13 +157,13 @@ kable(p,align = 'l', digits = round(4))
 
 Gráfica:
 
-_Línea negra: Monte Carlo Clásico_
 
-_Línea azul: Monte Carlo Antitética_
+
 ```{r}
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
@@ -185,16 +183,17 @@ _Para $n=1000$_
 ```{r}
 n=1000
 
-set.seed(1314)
 #Simulamos para Monte Carlo clásico
-x_mc <- mc.integral(f, 0, 1,n,plot = FALSE)
+set.seed(1750)
+x_mc <- mc.integral(finv, 0, 1,n,plot = FALSE)
 fx_mc <- x_mc[[1]]
 acum_mc <- x_mc[[2]]
 esterr_mc <- x_mc[[3]]
 error_mc <- x_mc$error
 
 #Simulamos para Monte Carlo con antitéticas
-x_mca <- mc.integral_anti(f, 0, 1, n,plot = FALSE)
+set.seed(1750)
+x_mca <- mc.integral_anti(finv, 0, 1, n,plot = FALSE)
 fx_mca <- x_mca[[1]]
 acum_mca <- x_mca[[2]]
 error_mca <- x_mca$error
@@ -212,13 +211,12 @@ kable(p,align = 'l', digits = round(4))
 
 Gráfica:
 
-_Línea negra: Monte Carlo Clásico_
 
-_Línea azul: Monte Carlo Antitética_
 ```{r}
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
@@ -234,11 +232,10 @@ _Porcentaje de Reducción de la varianza_
 ```
 
 
+***Aproximar mediante integración Monte Carlo (clásica) la media de una distribución exponencial
+de parámetro $1/2$: $$I=\int_0^\infty \frac{x}{2}e^{-\frac{x}{2}} dx$$ y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿se produce una reducción en la varianza?***
 
-
-
-
-### lo que Joel implementó
+<span style="color: DarkRed;">NOTA:</span> Puede ser recomendable emplear el método de inversión para generar las muestras (antitéticas) de la exponencial.
 
 
 ```{r eval=FALSE, include=FALSE}

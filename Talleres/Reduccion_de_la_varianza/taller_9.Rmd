@@ -8,6 +8,10 @@ output:
     theme: cerulean
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = F)
+```
+
 # Ejericio de Fin de Practica
 
 ***5. Aproximar  mediante integración Monte Carlo (clásica) el valor de la siguiente integral:$$I=\int_{-1}^1 \frac{1}{8}(5-3x^2)dx$$  y representar gráficamente la aproximación en función de $n$. Comparar los resultados con los obtenidos empleando variables antitéticas, ¿ Se produce una reducción de la varianza?***
@@ -31,7 +35,7 @@ mc.integral <- function(f, a, b, n, plot=TRUE) {
 }  
 ```
 
-Ahora, expondremos la función a utilizar para aproximar por el método de Monte Carlo con variables antitéticas:
+Ahora, expondremos la función a utilizar para aproximar por el método de Monte Carlo con variables antitéticas( asumiendo independencia):
 
 
 ```{r}
@@ -51,6 +55,30 @@ mc.integral_anti <- function(ftn, a, b, n, plot=TRUE) {
   } else return(list(x=fx,estint=estint,esterr=esterr,valor=mean(fx),error=2*sd(fx)/sqrt(n))) 
 }
 ```
+
+Ahora, expondremos la función a utilizar para aproximar por el método de Monte Carlo con variables antitéticas( asumiendo dependencia):
+
+```{r}
+# monte carlo antitetica asumiendo dependencia
+mc.integral_anti_dep <- function(ftn, a, b, n, plot=TRUE) {
+ x <- runif(n%/%2, a, b)
+ x <- matrix(c(x,a+b-x),nrow=2,byrow=TRUE) 
+ fx <- apply(x,1,ftn)*(b-a)
+ corr <- cor(fx[,1],fx[,2])
+ fx <- as.numeric(fx)
+ #if (plot) {
+    estint <- cumsum(fx)/(1:n)
+    esterr <- sqrt(cumsum((fx-estint)^2))/(1:n)
+  if(plot) {
+    plot(estint, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx)+2*c(-esterr[1],esterr[1]), xlab="Iteraciones")
+    abline(h=estint[n],lty=2)
+    lines(estint+2*esterr,col="gold",lwd=2)
+    lines(estint-2*esterr,col="gold",lwd=2)
+    return(list(x=fx,estint=estint,esterr=esterr,valor=estint[n],error=2*esterr[n]))
+  } else return(list(x=fx,estint=estint,esterr=esterr,valor=mean(fx),error=2*sd(fx)/sqrt(n)*sqrt(1+corr))) 
+}
+```
+
 
 
 Para la aproximación por Monte Carlo (clásico) y con variables antitéticas, utilizaremos el método de inversión, por lo que nuestra nueva función objetivo, a partir de la distribución exponencial, será la siguiente:
@@ -82,7 +110,7 @@ error_mc <- x_mc$error
 ```
 
 ```{r}
-#Simulamos para Monte Carlo con antitéticas para la función original
+#Simulamos para Monte Carlo antitetica
 set.seed(1750)
 x_mca <- mc.integral_anti(finv,0,sqrt(13/3), n,plot=T)
 fx_mca <- x_mca[[1]]
@@ -90,12 +118,23 @@ acum_mca <- x_mca[[2]]
 error_mca <- x_mca$error
 ```
 
+```{r}
+#Simulacion monte carlo antitetica asumiendo dependencia
+set.seed(1750)
+x_mcad <- mc.integral_anti_dep(finv, 0,sqrt(5/3) ,n,plot = T)
+fx_mcad <- x_mcad[[1]]
+acum_mcad <- x_mcad[[2]]
+esterr_mcad <- x_mcad[[3]]
+error_mcad <- x_mcad$error
+```
+
+
 Comparación de resultados
 ```{r echo=FALSE}
-Aproximación <- c(mean(fx_mc),mean(fx_mca))
-Error <- c(error_mc,error_mca)
+Aproximación <- c(mean(fx_mc),mean(fx_mca),mean(fx_mcad))
+Error <- c(error_mc,error_mca,error_mcad)
 p <- cbind(Aproximación,Error)
-row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética','Monte Carlo Antitética(Dependencia)')
 #Construcción de tabla de resultados con formato
 library(knitr)
 kable(p,align = 'l', digits = round(4))
@@ -110,28 +149,42 @@ Gráfica:
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones") 
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
-legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
+lines(acum_mcad,col='blue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético","M-C antitetico(dep)"), fill = c("black", "cadetblue","blue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
 
+Asumiendo independencia:
+
 _Porcentaje estimado de reducción del error:_
 
 ```{r}
-100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+100*( (x_mc$error - x_mca$error)/ x_mc$error )
 ```
 _Porcentaje de Reducción de la varianza_
 ```{r}
 100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
 ```
+Asumiendo dependencia:
 
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (x_mc$error - x_mcad$error)/ x_mc$error )
+```
+_Porcentaje de Reducción de la varianza_
+```{r}
+100*((var(fx_mc) - var(fx_mcad))/var(fx_mc))
+```
 
 _Para $n=500$_
+
 ```{r}
 n=500
 #Simulamos para Monte Carlo clásico
 set.seed(1750)
-x_mc <- mc.integral(finv, 0, 1,n,plot = FALSE)
+x_mc <- mc.integral(finv, 0, sqrt(5/3),n,plot = FALSE)
 fx_mc <- x_mc[[1]]
 acum_mc <- x_mc[[2]]
 esterr_mc <- x_mc[[3]]
@@ -139,18 +192,26 @@ error_mc <- x_mc$error
 
 #Simulamos para Monte Carlo con antitéticas
 set.seed(1750)
-x_mca <- mc.integral_anti(finv, 0, 1, n,plot = FALSE)
+x_mca <- mc.integral_anti(finv, 0, sqrt(5/3), n,plot = FALSE)
 fx_mca <- x_mca[[1]]
 acum_mca <- x_mca[[2]]
 error_mca <- x_mca$error
+
+#Simulacion monte carlo antitetica asumiendo dependencia
+set.seed(1750)
+x_mcad <- mc.integral_anti_dep(finv, 0,sqrt(5/3) ,n,plot = F)
+fx_mcad <- x_mcad[[1]]
+acum_mcad <- x_mcad[[2]]
+esterr_mcad <- x_mcad[[3]]
+error_mcad <- x_mcad$error
 ```
 
 Comparación de resultados
 ```{r echo=FALSE}
-Aproximación <- c(mean(fx_mc),mean(fx_mca))
-Error <- c(error_mc,error_mca)
+Aproximación <- c(mean(fx_mc),mean(fx_mca),mean(fx_mcad))
+Error <- c(error_mc,error_mca,error_mcad)
 p <- cbind(Aproximación,Error)
-row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética','Monte Carlo Antitética(dep)')
 
 kable(p,align = 'l', digits = round(4))
 ```
@@ -163,21 +224,36 @@ Gráfica:
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
-legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
+lines(acum_mcad,col='blue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue","blue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
 
+Asumiendo independencia:
 _Porcentaje estimado de reducción del error:_
 
 ```{r}
-100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+100*( (x_mc$error - x_mca$error)/ x_mc$error )
 ```
 _Porcentaje de Reducción de la varianza_
 
 ```{r}
 100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
 ```
+
+Asumiendo dependencia:
+
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (x_mc$error - x_mcad$error)/ x_mc$error )
+```
+_Porcentaje de Reducción de la varianza_
+```{r}
+100*((var(fx_mc) - var(fx_mcad))/var(fx_mc))
+```
+
 
 _Para $n=1000$_
 ```{r}
@@ -197,14 +273,23 @@ x_mca <- mc.integral_anti(finv, 0, 1, n,plot = FALSE)
 fx_mca <- x_mca[[1]]
 acum_mca <- x_mca[[2]]
 error_mca <- x_mca$error
+
+#Simulacion monte carlo antitetica asumiendo dependencia
+set.seed(1750)
+x_mcad <- mc.integral_anti_dep(finv, 0,sqrt(5/3) ,n,plot = F)
+fx_mcad <- x_mcad[[1]]
+acum_mcad <- x_mcad[[2]]
+esterr_mcad <- x_mcad[[3]]
+error_mcad <- x_mcad$error
+
 ```
 
 Comparación de resultados
 ```{r echo=FALSE}
-Aproximación <- c(mean(fx_mc),mean(fx_mca))
-Error <- c(error_mc,error_mca)
+Aproximación <- c(mean(fx_mc),mean(fx_mca),mean(fx_mcad))
+Error <- c(error_mc,error_mca,error_mcad)
 p <- cbind(Aproximación,Error)
-row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética')
+row.names(p) <- c('Monte Carlo Clásico','Monte Carlo Antitética','Monte Carlo Antitética(dep) ')
 
 kable(p,align = 'l', digits = round(4))
 ```
@@ -216,19 +301,34 @@ Gráfica:
 plot(acum_mc, ylab="Media y rango de error", type="l", lwd= 2, ylim=mean(fx_mc)+2*c(-esterr_mc[1],esterr_mc[1]), xlab="Iteraciones")
 abline(h = 2, lty = 2)
 lines(acum_mca,col='cadetblue')
-legend(x = "topright", legend = c("M-C clásico", "M-C antitético"), fill = c("black", "cadetblue") )
+lines(acum_mcad,col='blue')
+legend(x = "topright", legend = c("M-C clásico", "M-C antitético","M-C antitético(dep)"), fill = c("black", "cadetblue","blue") )
 ```
 
 Analizando ahora, el error cometido y la varianza tenemos:
 
+Asumiendo independecia:
+
 _Porcentaje estimado de reducción del error:_
 
 ```{r}
-100*( (mean(fx_mc) - mean(fx_mca))/mean(fx_mc))
+100*( (x_mc$error - x_mca$error)/ x_mc$error )
 ```
 _Porcentaje de Reducción de la varianza_
 ```{r}
 100*((var(fx_mc) - var(fx_mca))/var(fx_mc))
+```
+
+Asumiendo dependencia:
+
+_Porcentaje estimado de reducción del error:_
+
+```{r}
+100*( (x_mc$error - x_mcad$error)/ x_mc$error )
+```
+_Porcentaje de Reducción de la varianza_
+```{r}
+100*((var(fx_mc) - var(fx_mcad))/var(fx_mc))
 ```
 
 
